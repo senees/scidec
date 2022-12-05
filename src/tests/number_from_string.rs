@@ -37,6 +37,11 @@ fn _0002() {
 }
 
 #[test]
+fn _0002_8() {
+  num_fin(".12", false, 0, 12, -2);
+}
+
+#[test]
 fn _0002_1() {
   num_fin("000.0", false, 0, 0, -1);
 }
@@ -59,6 +64,21 @@ fn _0002_4() {
 #[test]
 fn _0002_6() {
   num_fin("1.", false, 0, 10, -1);
+}
+
+#[test]
+fn _0002_61() {
+  num_fin("1.0e2", false, 0, 10, 1);
+}
+
+#[test]
+fn _0002_62() {
+  num_fin("1.00e2", false, 0, 100, 0);
+}
+
+#[test]
+fn _0002_63() {
+  num_fin("1e5", false, 0, 1, 5);
 }
 
 #[test]
@@ -256,6 +276,11 @@ fn _0037() {
 #[test]
 fn _0037_a() {
   num_nan("1..", false);
+}
+
+#[test]
+fn _0037_b() {
+  num_nan(".", false);
 }
 
 #[test]

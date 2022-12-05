@@ -188,6 +188,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(value, ch, u128);
           state = State::DigitsBefore;
         }
+        '.' if position < last => state = State::DigitsAfter,
         'i' | 'I' => state = State::Inf2n,
         'n' | 'N' => state = State::Nan2a,
         's' | 'S' => {
