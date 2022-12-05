@@ -112,10 +112,10 @@ macro_rules! nan {
 /// ```
 /// use scidec::{Number, number_from_string};
 ///
-/// let result = number_from_string("12345e-2");
+/// let result = number_from_string("1234.5678e-2");
 /// match result {
-///   Number::Fin(false, 0, 12345, -2) => {}
-///   _=> panic!()
+///   Number::Fin(false, 0, 12345678, -6) => {}
+///   _ => panic!()
 /// }
 /// ```
 ///
@@ -126,7 +126,7 @@ macro_rules! nan {
 /// let result = number_from_string("inf");
 /// match result {
 ///   Number::Inf(false) => {}
-///   _=> panic!()
+///   _ => panic!()
 /// }
 /// ```
 ///
@@ -137,7 +137,7 @@ macro_rules! nan {
 /// let result = number_from_string("-Infinity");
 /// match result {
 ///   Number::Inf(true) => {}
-///   _=> panic!()
+///   _ => panic!()
 /// }
 /// ```
 ///
@@ -148,7 +148,7 @@ macro_rules! nan {
 /// let result = number_from_string("NaN");
 /// match result {
 ///   Number::NaN(false) => {}
-///   _=> panic!()
+///   _ => panic!()
 /// }
 /// ```
 ///
@@ -159,7 +159,7 @@ macro_rules! nan {
 /// let result = number_from_string("SNaN");
 /// match result {
 ///   Number::NaN(true) => {}
-///   _=> panic!()
+///   _ => panic!()
 /// }
 /// ```
 pub fn number_from_string(input: &str) -> Number {
@@ -213,6 +213,7 @@ pub fn number_from_string(input: &str) -> Number {
       },
       State::DigitsBefore => match ch {
         '0'..='9' => mul_add!(value, ch, u128),
+        '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
         _ => nan!(),
       },
