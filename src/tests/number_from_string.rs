@@ -288,19 +288,63 @@ fn _0051() {
 }
 
 #[test]
-fn _0051_() {
+fn _0052() {
   num_nan("infinitya", false);
 }
 
 #[test]
-fn _0052() {
+fn _0053() {
   num_nan("sun", false);
+}
+
+#[test]
+fn _0054() {
+  num_fin(
+    "340282366920938463463374607431768211455",
+    false,
+    0xFFFFFFFFFFFFFFFF,
+    0xFFFFFFFFFFFFFFFF,
+    0,
+  );
+}
+
+#[test]
+fn _0055() {
+  num_fin(
+    "-340282366920938463463374607431768211455",
+    true,
+    0xFFFFFFFFFFFFFFFF,
+    0xFFFFFFFFFFFFFFFF,
+    0,
+  );
+}
+
+#[test]
+fn _0056() {
+  num_fin(
+    "+340282366920938463463374607431768211455E+2147483647",
+    false,
+    0xFFFFFFFFFFFFFFFF,
+    0xFFFFFFFFFFFFFFFF,
+    0x7FFFFFFF,
+  );
+}
+
+#[test]
+fn _0057() {
+  num_fin(
+    "-340282366920938463463374607431768211455E-2147483647",
+    true,
+    0xFFFFFFFFFFFFFFFF,
+    0xFFFFFFFFFFFFFFFF,
+    -0x7FFFFFFF,
+  );
 }
 
 #[cfg(not(feature = "coverage"))]
 #[test]
 #[should_panic(expected = "attempt to multiply with overflow")]
-fn _0053() {
+fn _0058() {
   num_fin(
     "99999999999999999999999999999999999999999999999999999999999999999",
     false,
@@ -308,4 +352,32 @@ fn _0053() {
     0,
     0,
   );
+}
+
+#[cfg(not(feature = "coverage"))]
+#[test]
+#[should_panic(expected = "attempt to add with overflow")]
+fn _0059() {
+  num_fin("340282366920938463463374607431768211456", true, 0, 0, 0);
+}
+
+#[cfg(not(feature = "coverage"))]
+#[test]
+#[should_panic(expected = "attempt to add with overflow")]
+fn _0060() {
+  num_fin("-340282366920938463463374607431768211456", true, 0, 0, 0);
+}
+
+#[cfg(not(feature = "coverage"))]
+#[test]
+#[should_panic(expected = "attempt to add with overflow")]
+fn _0061() {
+  num_fin("340282366920938463463374607431768211455E+2147483648", false, 0, 0, 0);
+}
+
+#[cfg(not(feature = "coverage"))]
+#[test]
+#[should_panic(expected = "attempt to add with overflow")]
+fn _0062() {
+  num_fin("-340282366920938463463374607431768211455E-2147483648", false, 0, 0, 0);
 }
