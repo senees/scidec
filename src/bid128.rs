@@ -22,123 +22,54 @@
  * SOFTWARE.
  */
 
-//! # Number parser
+//! # Number parser for 128-bit floating-point decimals.
 
 use crate::common::{mul_add, State};
 
-/// Parsed number.
+/// 128-bit decimal in binary format.
 #[derive(Eq, PartialEq)]
-pub enum Number {
-  /// Variant representing a finite number.
-  Fin(
-    /// Flag indicating if the number is signed,
-    /// `true` signed (`-` minus), `false` unsigned (`+` plus).
-    bool,
-    /// Higher 64-bits of the number.
-    u64,
-    /// Lower 64-bits of the number.
-    u64,
-    /// Exponent.
-    i32,
-  ),
-  /// Variant representing an infinity.
-  Inf(
-    /// Flag indicating if the infinity is signed,
-    /// `true` positive infinity, `false` negative infinity.
-    bool,
-  ),
-  /// Variant representing an invalid number.
-  NaN(
-    /// Flag indicating if this is a signalling NaN,
-    /// `true` signaling, `false` quiet.
-    bool,
-  ),
+pub struct Bid128 {
+  w: [u64; 2],
 }
 
-/// Returns not-a-number variant of the number.
-macro_rules! nan {
-  () => {
-    return Number::NaN(false)
-  };
-}
+const BID128_NAN: Bid128 = Bid128 { w: [0, 2] };
 
-/// Parses a number properties from text in scientific notation.
+/// Parses a 128-bit floating-point decimal from text in scientific notation.
 ///
 /// Minimum parsed number is:
 /// ```text
-/// -340282366920938463463374607431768211455E-2147483647
+/// ?
 /// ```
 ///
 /// Maximum parsed number is:
 /// ```text
-/// +340282366920938463463374607431768211455E+2147483647
+/// ?
 /// ```
-///
-/// # Panics
-///
-/// This function panics when the parsed number is less than the minimum value
-/// or greater than the maximum value (overflow error is raised).
-/// Overflows are not checked to get the maximum performance.
 ///
 /// # Examples
 ///
 /// Input text represents a finite number.
 /// ```
-/// use scidec::{Number, number_from_string};
-///
-/// let result = number_from_string("1234.5678e-2");
-/// match result {
-///   Number::Fin(false, 0, 12345678, -6) => {}
-///   _ => panic!()
-/// }
 /// ```
 ///
 /// Input text represents a positive infinity.
 /// ```
-/// use scidec::{Number, number_from_string};
-///
-/// let result = number_from_string("inf");
-/// match result {
-///   Number::Inf(false) => {}
-///   _ => panic!()
-/// }
 /// ```
 ///
 /// Input text represents a negative infinity.
 /// ```
-/// use scidec::{Number, number_from_string};
-///
-/// let result = number_from_string("-Infinity");
-/// match result {
-///   Number::Inf(true) => {}
-///   _ => panic!()
-/// }
 /// ```
 ///
 /// Input text represents quiet not-a-number.
 /// ```
-/// use scidec::{Number, number_from_string};
-///
-/// let result = number_from_string("NaN");
-/// match result {
-///   Number::NaN(false) => {}
-///   _ => panic!()
-/// }
 /// ```
 ///
 /// Input text represents signaling not-a-number.
 /// ```
-/// use scidec::{Number, number_from_string};
-///
-/// let result = number_from_string("SNaN");
-/// match result {
-///   Number::NaN(true) => {}
-///   _ => panic!()
-/// }
 /// ```
-pub fn number_from_string(input: &str) -> Number {
+pub fn bid128_from_string(input: &str) -> Bid128 {
   if input.is_empty() {
-    nan!();
+    return BID128_NAN;
   }
   let mut state = State::BeginNumber;
   let mut sign = false;
@@ -169,7 +100,7 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::LeadingZeros => match ch {
         '0' => {}
@@ -188,7 +119,7 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::DigitsBefore => match ch {
         '0'..='9' => mul_add!(value, ch, u128),
@@ -198,7 +129,7 @@ pub fn number_from_string(input: &str) -> Number {
         }
         '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::DigitsAfter => match ch {
         '0'..='9' => {
@@ -206,7 +137,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(value, ch, u128);
         }
         'E' | 'e' if position < last => state = State::ExponentSign,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::ExponentSign => match ch {
         '+' | '0' if position < last => state = State::ExponentLeadingZeros,
@@ -218,7 +149,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::ExponentLeadingZeros => match ch {
         '0' => {}
@@ -226,69 +157,70 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
           mul_add!(exponent_base, ch, i32);
         }
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf2n => match ch {
         'n' | 'N' => state = State::Inf3f,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf3f => match ch {
         'f' | 'F' if position == last => infinity = true,
         'f' | 'F' => state = State::Inf4i,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf4i => match ch {
         'i' | 'I' => state = State::Inf5n,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf5n => match ch {
         'n' | 'N' => state = State::Inf6i,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf6i => match ch {
         'i' | 'I' => state = State::Inf7t,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf7t => match ch {
         't' | 'T' => state = State::Inf8y,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Inf8y => match ch {
         'y' | 'Y' if position == last => infinity = true,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Nan1n => match ch {
         'n' | 'N' => state = State::Nan2a,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Nan2a => match ch {
         'a' | 'A' => state = State::Nan3n,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
       State::Nan3n => match ch {
         'n' | 'N' if position == last => nan = true,
-        _ => nan!(),
+        _ => return BID128_NAN,
       },
     }
   }
   if infinity {
-    return Number::Inf(sign);
+    return BID128_NAN;
   }
   if nan {
-    return Number::NaN(signaling);
+    return BID128_NAN;
   }
-  Number::Fin(
-    sign,
-    (value >> 64) as u64,
-    value as u64,
-    exponent + exponent_sign * exponent_base,
-  )
+  // Bid128::Fin(
+  //   sign,
+  //   (value >> 64) as u64,
+  //   value as u64,
+  //   exponent + exponent_sign * exponent_base,
+  // )
+  BID128_NAN
 }
 
 #[cfg(test)]
@@ -297,12 +229,6 @@ mod tests {
 
   #[test]
   fn test_eq() {
-    assert!((Number::Fin(false, 0, 0, 0) == Number::Fin(false, 0, 0, 0)));
-    assert!((Number::Fin(false, 0, 0, 0) != Number::Inf(false)));
-    assert!((Number::Inf(true) != Number::Inf(false)));
-    assert!((Number::Inf(true) == Number::Inf(true)));
-    assert!((Number::NaN(true) != Number::NaN(false)));
-    assert!((Number::NaN(false) == Number::NaN(false)));
-    Number::Inf(false).assert_receiver_is_total_eq();
+    Bid128 { w: [0, 2] }.assert_receiver_is_total_eq();
   }
 }
