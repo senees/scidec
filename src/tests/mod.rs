@@ -3,7 +3,7 @@ use crate::parser::Value;
 
 fn num(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match parse(input) {
-    Value::Number(actual_sign, actual_w1, actual_w0, actual_exponent) => {
+    Value::Num(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
       assert_eq!(w1, actual_w1);
       assert_eq!(w0, actual_w0);
@@ -15,23 +15,15 @@ fn num(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
 
 fn inf(input: &str, sign: bool) {
   match parse(input) {
-    Value::Infinity => assert!(!sign),
-    Value::NegativeInfinity => assert!(sign),
+    Value::Inf(actual_sign) => assert_eq!(sign, actual_sign),
     other => panic!("expected infinity, actual value is {:?}", other),
   }
 }
 
-fn nan(input: &str) {
+fn nan(input: &str, signaling: bool) {
   match parse(input) {
-    Value::NaN => {}
+    Value::NaN(actual_signaling) => assert_eq!(signaling, actual_signaling),
     other => panic!("expected NaN, actual value is {:?}", other),
-  }
-}
-
-fn snan(input: &str) {
-  match parse(input) {
-    Value::SNaN => {}
-    other => panic!("expected SNaN, actual value is {:?}", other),
   }
 }
 
@@ -154,45 +146,45 @@ fn _0056() {
 
 #[test]
 fn _0057() {
-  nan("NaN");
+  nan("NaN", false);
 }
 
 #[test]
 fn _00571() {
-  nan("nan");
+  nan("nan", false);
 }
 
 #[test]
 fn _0057_2() {
-  nan("NAN");
+  nan("NAN", false);
 }
 
 #[test]
 fn _00572() {
-  nan("+NaN");
+  nan("+NaN", false);
 }
 
 #[test]
 fn _00572_1() {
-  nan("-NaN");
+  nan("-NaN", false);
 }
 
 #[test]
 fn _0058() {
-  snan("SNaN");
+  nan("SNaN", true);
 }
 
 #[test]
 fn _0059() {
-  snan("+SNaN");
+  nan("+SNaN", true);
 }
 
 #[test]
 fn _0060() {
-  snan("-SNaN");
+  nan("-SNaN", true);
 }
 
 #[test]
 fn _0061() {
-  snan("-SNAN");
+  nan("-SNAN", true);
 }

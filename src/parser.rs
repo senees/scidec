@@ -1,11 +1,9 @@
 ///
 #[derive(Debug)]
 pub enum Value {
-  Number(bool, u64, u64, i32),
-  Infinity,
-  NegativeInfinity,
-  NaN,
-  SNaN,
+  Num(bool, u64, u64, i32),
+  Inf(bool),
+  NaN(bool),
 }
 
 ///
@@ -35,7 +33,7 @@ pub fn parse(input: &str) -> Value {
   let mut sign = false;
   let mut exponent = 0_i32;
   let mut exponent_base = 0_i32;
-  let mut exponent_sign = false;
+  let mut exponent_sign = 1_i32;
   let mut value = 0_u128;
   let mut infinity = false;
   let mut nan = false;
@@ -93,7 +91,7 @@ pub fn parse(input: &str) -> Value {
       State::ExponentSign => match ch {
         '+' | '0' => state = State::ExponentLeadingZeros,
         '-' => {
-          exponent_sign = true;
+          exponent_sign = -1_i32;
           state = State::ExponentLeadingZeros;
         }
         '1'..='9' => {
@@ -160,13 +158,10 @@ pub fn parse(input: &str) -> Value {
     }
   }
   if infinity {
-    return if sign { Value::NegativeInfinity } else { Value::Infinity };
+    return Value::Inf(sign);
   }
   if nan {
-    return if signaling { Value::SNaN } else { Value::NaN };
+    return Value::NaN(signaling);
   }
-  if exponent_sign {
-    exponent_base = -exponent_base;
-  }
-  Value::Number(sign, (value >> 64) as u64, value as u64, exponent + exponent_base)
+  Value::Num(sign, (value >> 64) as u64, value as u64, exponent + exponent_sign * exponent_base)
 }
