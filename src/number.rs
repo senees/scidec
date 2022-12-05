@@ -35,7 +35,17 @@ macro_rules! mul_add {
 }
 
 ///
+macro_rules! nan {
+  () => {
+    return Number::NaN(false)
+  };
+}
+
+///
 pub fn number_from_string(input: &str) -> Number {
+  if input.is_empty() {
+    nan!();
+  }
   let mut state = State::BeginNumber;
   let mut sign = false;
   let mut exponent = 0_i32;
@@ -64,7 +74,7 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => panic!("ERROR1"),
+        _ => nan!(),
       },
       State::LeadingZeros => match ch {
         '0' => {}
@@ -79,24 +89,24 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => panic!("ERROR2"),
+        _ => nan!(),
       },
       State::DigitsBefore => match ch {
         '0'..='9' => mul_add!(value, ch, u128),
         'E' | 'e' => state = State::ExponentSign,
-        _ => panic!("ERROR3"),
+        _ => nan!(),
       },
       State::DigitsAfter => match ch {
         '0'..='9' => {
           exponent -= 1;
           mul_add!(value, ch, u128);
         }
-        'E' | 'e' => state = State::ExponentSign,
-        _ => panic!("ERROR4"),
+        'E' | 'e' if position < last => state = State::ExponentSign,
+        _ => nan!(),
       },
       State::ExponentSign => match ch {
-        '+' | '0' => state = State::ExponentLeadingZeros,
-        '-' => {
+        '+' | '0' if position < last => state = State::ExponentLeadingZeros,
+        '-' if position < last => {
           exponent_sign = -1_i32;
           state = State::ExponentLeadingZeros;
         }
@@ -104,7 +114,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => panic!("ERROR5"),
+        _ => nan!(),
       },
       State::ExponentLeadingZeros => match ch {
         '0' => {}
@@ -112,54 +122,54 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => panic!("ERROR6"),
+        _ => nan!(),
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
           mul_add!(exponent_base, ch, i32);
         }
-        _ => panic!("ERROR7"),
+        _ => nan!(),
       },
       State::Inf2n => match ch {
         'n' | 'N' => state = State::Inf3f,
-        _ => panic!("ERROR8"),
+        _ => nan!(),
       },
       State::Inf3f => match ch {
         'f' | 'F' if position == last => infinity = true,
         'f' | 'F' => state = State::Inf4i,
-        _ => panic!("ERROR9"),
+        _ => nan!(),
       },
       State::Inf4i => match ch {
         'i' | 'I' => state = State::Inf5n,
-        _ => panic!("ERROR10"),
+        _ => nan!(),
       },
       State::Inf5n => match ch {
         'n' | 'N' => state = State::Inf6i,
-        _ => panic!("ERROR11"),
+        _ => nan!(),
       },
       State::Inf6i => match ch {
         'i' | 'I' => state = State::Inf7t,
-        _ => panic!("ERROR12"),
+        _ => nan!(),
       },
       State::Inf7t => match ch {
         't' | 'T' => state = State::Inf8y,
-        _ => panic!("ERROR13"),
+        _ => nan!(),
       },
       State::Inf8y => match ch {
         'y' | 'Y' if position == last => infinity = true,
-        _ => panic!("ERROR14"),
+        _ => nan!(),
       },
       State::Nan1n => match ch {
         'n' | 'N' => state = State::Nan2a,
-        _ => panic!("ERROR15"),
+        _ => nan!(),
       },
       State::Nan2a => match ch {
         'a' | 'A' => state = State::Nan3n,
-        _ => panic!("ERROR16"),
+        _ => nan!(),
       },
       State::Nan3n => match ch {
         'n' | 'N' if position == last => nan = true,
-        _ => panic!("ERROR17"),
+        _ => nan!(),
       },
     }
   }
@@ -170,4 +180,23 @@ pub fn number_from_string(input: &str) -> Number {
     return Number::NaN(signaling);
   }
   Number::Finite(sign, (value >> 64) as u64, value as u64, exponent + exponent_sign * exponent_base)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_debug() {
+    assert_eq!("Finite(false, 0, 0, 0)", format!("{:?}", Number::Finite(false, 0, 0, 0)));
+    assert_eq!("Inf(false)", format!("{:?}", Number::Inf(false)));
+    assert_eq!("NaN(false)", format!("{:?}", Number::NaN(false)));
+  }
+
+  #[test]
+  fn test_eq() {
+    assert_eq!(Number::Finite(false, 0, 0, 0), Number::Finite(false, 0, 0, 0));
+    assert_ne!(Number::Finite(false, 0, 0, 0), Number::Inf(false));
+    Number::Inf(false).assert_receiver_is_total_eq();
+  }
 }
