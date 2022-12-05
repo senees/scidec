@@ -24,6 +24,8 @@
 
 //! # Library for parsing numbers from text in scientific format
 
+#![no_std]
+
 extern crate core;
 
 mod number;

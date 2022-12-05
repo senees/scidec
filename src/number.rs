@@ -25,7 +25,7 @@
 //! # Number parser
 
 /// Parsed number.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Eq, PartialEq)]
 pub enum Number {
   /// Variant representing a finite number.
   Fin(
@@ -296,16 +296,13 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_debug() {
-    assert_eq!("Fin(false, 0, 0, 0)", format!("{:?}", Number::Fin(false, 0, 0, 0)));
-    assert_eq!("Inf(false)", format!("{:?}", Number::Inf(false)));
-    assert_eq!("NaN(false)", format!("{:?}", Number::NaN(false)));
-  }
-
-  #[test]
   fn test_eq() {
-    assert_eq!(Number::Fin(false, 0, 0, 0), Number::Fin(false, 0, 0, 0));
-    assert_ne!(Number::Fin(false, 0, 0, 0), Number::Inf(false));
+    assert!((Number::Fin(false, 0, 0, 0) == Number::Fin(false, 0, 0, 0)));
+    assert!((Number::Fin(false, 0, 0, 0) != Number::Inf(false)));
+    assert!((Number::Inf(true) != Number::Inf(false)));
+    assert!((Number::Inf(true) == Number::Inf(true)));
+    assert!((Number::NaN(true) != Number::NaN(false)));
+    assert!((Number::NaN(false) == Number::NaN(false)));
     Number::Inf(false).assert_receiver_is_total_eq();
   }
 }

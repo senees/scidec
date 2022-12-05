@@ -27,6 +27,7 @@ tasks:
       - cmd: cargo +stable build --release --target=x86_64-unknown-linux-gnu
       - cmd: cargo +nightly build --release --target=x86_64-unknown-linux-musl
       - cmd: cargo +nightly build --release --target=wasm32-unknown-unknown
+      - cmd: cargo +nightly build --release --target=wasm32-unknown-emscripten
       - cmd: cargo +nightly build --release --target=wasm32-wasi
 
   clean:
