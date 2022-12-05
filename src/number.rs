@@ -75,9 +75,8 @@ pub fn number_from_string(input: &str) -> Number {
         _ => panic!("ERROR2"),
       },
       State::DigitsBefore => match ch {
-        '0'..='9' => {
-          value = value * 10 + ((ch as u8) - b'0') as u128;
-        }
+        '0'..='9' => value = value * 10 + ((ch as u8) - b'0') as u128,
+        'E' | 'e' => state = State::ExponentSign,
         _ => panic!("ERROR3"),
       },
       State::DigitsAfter => match ch {
