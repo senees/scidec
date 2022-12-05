@@ -356,6 +356,19 @@ fn _0058() {
 
 #[cfg(not(feature = "coverage"))]
 #[test]
+#[should_panic(expected = "attempt to multiply with overflow")]
+fn _0058_() {
+  num_fin(
+    "-99999999999999999999999999999999999999999999999999999999999999999",
+    false,
+    0,
+    0,
+    0,
+  );
+}
+
+#[cfg(not(feature = "coverage"))]
+#[test]
 #[should_panic(expected = "attempt to add with overflow")]
 fn _0059() {
   num_fin("340282366920938463463374607431768211456", true, 0, 0, 0);
