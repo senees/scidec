@@ -203,7 +203,12 @@ pub fn number_from_string(input: &str) -> Number {
   if nan {
     return Number::NaN(signaling);
   }
-  Number::Finite(sign, (value >> 64) as u64, value as u64, exponent + exponent_sign * exponent_base)
+  Number::Finite(
+    sign,
+    (value >> 64) as u64,
+    value as u64,
+    exponent + exponent_sign * exponent_base,
+  )
 }
 
 #[cfg(test)]
@@ -212,7 +217,10 @@ mod tests {
 
   #[test]
   fn test_debug() {
-    assert_eq!("Finite(false, 0, 0, 0)", format!("{:?}", Number::Finite(false, 0, 0, 0)));
+    assert_eq!(
+      "Finite(false, 0, 0, 0)",
+      format!("{:?}", Number::Finite(false, 0, 0, 0))
+    );
     assert_eq!("Inf(false)", format!("{:?}", Number::Inf(false)));
     assert_eq!("NaN(false)", format!("{:?}", Number::NaN(false)));
   }
