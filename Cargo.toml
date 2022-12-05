@@ -1,9 +1,9 @@
 [package]
 name = "scidec"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Dariusz Depta <depta@senees.de>"]
 description = "Scientific to decimal number converter"
-documentation = "https://docs.rs/scidec"
+documentation = "https://docs.rs/scidec/"
 repository = "https://github.com/senees/scidec.git"
 license = "MIT"
 edition = "2021"
