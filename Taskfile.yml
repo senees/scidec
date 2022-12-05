@@ -1,0 +1,59 @@
+version: '3'
+
+silent: true
+
+tasks:
+
+  build:
+    desc: Builds the library
+    cmds:
+      - cmd: cargo build
+
+  bm:
+    desc: Builds the library for multiple targets
+    cmds:
+      - cmd: cargo +stable build --release --target=x86_64-unknown-linux-gnu
+      - cmd: cargo +nightly build --release --target=x86_64-unknown-linux-musl
+      - cmd: cargo +nightly build --release --target=wasm32-unknown-unknown
+      - cmd: cargo +nightly build --release --target=wasm32-wasi
+
+  clean:
+    desc: Cleans all targets
+    cmds:
+      - cmd: cargo clean
+
+  cov:
+    desc: Runs code coverage using grcov
+    cmds:
+      - cmd: ./coverage.sh
+
+  doc:
+    desc: Generates the documentation
+    cmds:
+      - cmd: cargo doc --no-deps
+
+  doc-open:
+    desc: Generates the documentation and opens it in the browser
+    cmds:
+      - cmd: cargo doc --no-deps --open
+
+  release:
+    desc: Builds the library in release mode
+    cmds:
+      - cmd: cargo clean
+      - cmd: cargo +stable build --release
+
+  test:
+    desc: Tests the library
+    cmds:
+      - cmd: cargo test
+
+  clippy:
+    desc: Runs clippy for all targets
+    cmds:
+      - cmd: cargo clippy --all-targets
+
+  fmt:
+    desc: Runs the code formatter
+    cmds:
+      - cmd: cargo fmt
