@@ -2,7 +2,7 @@ use crate::{number_from_string, Number};
 
 mod number_from_string;
 
-fn num_finite(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
+fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
     Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
