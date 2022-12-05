@@ -1,12 +1,12 @@
-# Scientific to decimal number format converter
+# Number converter from scientific notation
 
-This library parses the input text containing a number in scientific format like
+The library converts the input text containing a number in scientific notation, e.g:
 
 ```
 1234.5678e-2
 ```
 
-and converts it to a number, represented by the following tuple
+to number, represented by the following tuple:
 
 ```
 (sign, mantissa-hi-64-bits, mantissa-lo-64-bits, exponent)
