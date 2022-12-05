@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-//! Library for parsing numbers from text in scientific format.
+//! # Library for parsing numbers from text in scientific format
 
 extern crate core;
 

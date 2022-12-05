@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-//!
+//! Benchmarks.
 
 #![feature(test)]
 

@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+//! # Number parser
+
 /// Parsed number.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Number {

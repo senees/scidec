@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-//!
+//! Unit tests for parsing numbers.
 
 use super::*;
 

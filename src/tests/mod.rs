@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-//!
+//! Utility functions for unit tests.
 
 use crate::{number_from_string, Number};
 
