@@ -30,7 +30,7 @@ mod number_from_string;
 
 fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
-    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
+    Number::Fin(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
       assert_eq!(w1, actual_w1);
       assert_eq!(w0, actual_w0);

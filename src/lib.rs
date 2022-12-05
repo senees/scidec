@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+//! Library for parsing numbers from text in scientific format.
+
 extern crate core;
 
 mod number;
