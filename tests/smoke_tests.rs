@@ -22,7 +22,10 @@
  * SOFTWARE.
  */
 
+//! # Smoke tests
 //!
+//! Functions exposed by this library are intensively tested using unit tests.
+//! Smoke tests check only the correctness of the library interface.
 
 use scidec::{number_from_string, Number};
 
