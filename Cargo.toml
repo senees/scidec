@@ -7,3 +7,7 @@ documentation = "https://docs.rs/scidec"
 repository = "https://github.com/senees/scidec.git"
 license = "MIT"
 edition = "2021"
+
+[features]
+default = []
+coverage = []

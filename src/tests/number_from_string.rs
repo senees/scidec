@@ -155,6 +155,7 @@ fn _0031() {
   num_nan("-SNAN", true);
 }
 
+#[cfg(not(feature = "coverage"))]
 #[test]
 #[should_panic(expected = "attempt to multiply with overflow")]
 fn _0032() {
