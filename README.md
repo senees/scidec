@@ -1,18 +1,18 @@
 # Scientific to decimal number format converter
 
-This library parses the input text containing a number in scientific format like:
+This library parses the input text containing a number in scientific format like
 
 ```
 1234.5678e-2
 ```
 
-and converts to a number represented by the following tuple:
+and converts it to a number, represented by the following tuple
 
 ```
 (sign, mantissa-hi-64-bits, mantissa-lo-64-bits, exponent)
 ```
 
-for example:
+Example:
 
 ```Rust
 use scidec::{Number, number_from_string};
