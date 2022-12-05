@@ -1,9 +1,9 @@
-use crate::parse;
-use crate::parser::Value;
+use crate::number::Number;
+use crate::number_from_string;
 
 fn num(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
-  match parse(input) {
-    Value::Num(actual_sign, actual_w1, actual_w0, actual_exponent) => {
+  match number_from_string(input) {
+    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
       assert_eq!(w1, actual_w1);
       assert_eq!(w0, actual_w0);
@@ -14,15 +14,15 @@ fn num(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
 }
 
 fn inf(input: &str, sign: bool) {
-  match parse(input) {
-    Value::Inf(actual_sign) => assert_eq!(sign, actual_sign),
+  match number_from_string(input) {
+    Number::Inf(actual_sign) => assert_eq!(sign, actual_sign),
     other => panic!("expected infinity, actual value is {:?}", other),
   }
 }
 
 fn nan(input: &str, signaling: bool) {
-  match parse(input) {
-    Value::NaN(actual_signaling) => assert_eq!(signaling, actual_signaling),
+  match number_from_string(input) {
+    Number::NaN(actual_signaling) => assert_eq!(signaling, actual_signaling),
     other => panic!("expected NaN, actual value is {:?}", other),
   }
 }

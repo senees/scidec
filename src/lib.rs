@@ -1,5 +1,5 @@
-mod parser;
+mod number;
 #[cfg(test)]
 mod tests;
 
-pub use parser::parse;
+pub use number::{number_from_string, Number};

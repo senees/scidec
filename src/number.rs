@@ -1,7 +1,7 @@
 ///
-#[derive(Debug)]
-pub enum Value {
-  Num(bool, u64, u64, i32),
+#[derive(Debug, Eq, PartialEq)]
+pub enum Number {
+  Finite(bool, u64, u64, i32),
   Inf(bool),
   NaN(bool),
 }
@@ -28,7 +28,7 @@ enum State {
 }
 
 ///
-pub fn parse(input: &str) -> Value {
+pub fn number_from_string(input: &str) -> Number {
   let mut state = State::BeginNumber;
   let mut sign = false;
   let mut exponent = 0_i32;
@@ -158,10 +158,10 @@ pub fn parse(input: &str) -> Value {
     }
   }
   if infinity {
-    return Value::Inf(sign);
+    return Number::Inf(sign);
   }
   if nan {
-    return Value::NaN(signaling);
+    return Number::NaN(signaling);
   }
-  Value::Num(sign, (value >> 64) as u64, value as u64, exponent + exponent_sign * exponent_base)
+  Number::Finite(sign, (value >> 64) as u64, value as u64, exponent + exponent_sign * exponent_base)
 }

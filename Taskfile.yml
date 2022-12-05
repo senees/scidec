@@ -4,12 +4,17 @@ silent: true
 
 tasks:
 
+  bench:
+    desc: Runs benchmarks
+    cmds:
+      - cmd: cargo +nightly bench
+
   build:
     desc: Builds the library
     cmds:
       - cmd: cargo build
 
-  bm:
+  build-all:
     desc: Builds the library for multiple targets
     cmds:
       - cmd: cargo +stable build --release --target=x86_64-unknown-linux-gnu
@@ -56,4 +61,4 @@ tasks:
   fmt:
     desc: Runs the code formatter
     cmds:
-      - cmd: cargo fmt
+      - cmd: cargo +nightly fmt
