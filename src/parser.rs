@@ -1,3 +1,14 @@
+///
+#[derive(Debug)]
+pub enum Value {
+  Number(bool, u64, u64, i32),
+  Infinity,
+  NegativeInfinity,
+  NaN,
+  SNaN,
+}
+
+///
 enum State {
   BeginNumber,
   LeadingZeros,
@@ -6,17 +17,31 @@ enum State {
   ExponentSign,
   ExponentLeadingZeros,
   ExponentDigits,
+  Inf2n,
+  Inf3f,
+  Inf4i,
+  Inf5n,
+  Inf6i,
+  Inf7t,
+  Inf8y,
+  Nan1n,
+  Nan2a,
+  Nan3n,
 }
 
 ///
-pub fn parse(input: &str) -> (bool, u64, u64, i32) {
+pub fn parse(input: &str) -> Value {
   let mut state = State::BeginNumber;
   let mut sign = false;
   let mut exponent = 0_i32;
   let mut exponent_base = 0_i32;
   let mut exponent_sign = false;
   let mut value = 0_u128;
-  for ch in input.chars() {
+  let mut infinity = false;
+  let mut nan = false;
+  let mut signaling = false;
+  let last = input.len() - 1;
+  for (position, ch) in input.chars().enumerate() {
     match state {
       State::BeginNumber => match ch {
         '-' => {
@@ -28,6 +53,12 @@ pub fn parse(input: &str) -> (bool, u64, u64, i32) {
           value = value * 10 + ((ch as u8) - b'0') as u128;
           state = State::DigitsBefore;
         }
+        'i' | 'I' => state = State::Inf2n,
+        'n' | 'N' => state = State::Nan2a,
+        's' | 'S' => {
+          signaling = true;
+          state = State::Nan1n
+        }
         _ => panic!("ERROR1"),
       },
       State::LeadingZeros => match ch {
@@ -37,6 +68,12 @@ pub fn parse(input: &str) -> (bool, u64, u64, i32) {
           state = State::DigitsBefore;
         }
         '.' => state = State::DigitsAfter,
+        'i' | 'I' => state = State::Inf2n,
+        'n' | 'N' => state = State::Nan2a,
+        's' | 'S' => {
+          signaling = true;
+          state = State::Nan1n
+        }
         _ => panic!("ERROR2"),
       },
       State::DigitsBefore => match ch {
@@ -79,10 +116,57 @@ pub fn parse(input: &str) -> (bool, u64, u64, i32) {
         }
         _ => panic!("ERROR7"),
       },
+      State::Inf2n => match ch {
+        'n' | 'N' => state = State::Inf3f,
+        _ => panic!("ERROR8"),
+      },
+      State::Inf3f => match ch {
+        'f' | 'F' if position == last => infinity = true,
+        'f' | 'F' => state = State::Inf4i,
+        _ => panic!("ERROR9"),
+      },
+      State::Inf4i => match ch {
+        'i' | 'I' => state = State::Inf5n,
+        _ => panic!("ERROR10"),
+      },
+      State::Inf5n => match ch {
+        'n' | 'N' => state = State::Inf6i,
+        _ => panic!("ERROR11"),
+      },
+      State::Inf6i => match ch {
+        'i' | 'I' => state = State::Inf7t,
+        _ => panic!("ERROR12"),
+      },
+      State::Inf7t => match ch {
+        't' | 'T' => state = State::Inf8y,
+        _ => panic!("ERROR13"),
+      },
+      State::Inf8y => match ch {
+        'y' | 'Y' if position == last => infinity = true,
+        _ => panic!("ERROR14"),
+      },
+      State::Nan1n => match ch {
+        'n' | 'N' => state = State::Nan2a,
+        _ => panic!("ERROR15"),
+      },
+      State::Nan2a => match ch {
+        'a' | 'A' => state = State::Nan3n,
+        _ => panic!("ERROR16"),
+      },
+      State::Nan3n => match ch {
+        'n' | 'N' if position == last => nan = true,
+        _ => panic!("ERROR17"),
+      },
     }
+  }
+  if infinity {
+    return if sign { Value::NegativeInfinity } else { Value::Infinity };
+  }
+  if nan {
+    return if signaling { Value::SNaN } else { Value::NaN };
   }
   if exponent_sign {
     exponent_base = -exponent_base;
   }
-  (sign, (value >> 64) as u64, value as u64, exponent + exponent_base)
+  Value::Number(sign, (value >> 64) as u64, value as u64, exponent + exponent_base)
 }
