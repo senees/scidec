@@ -256,6 +256,11 @@ fn _0051() {
 }
 
 #[test]
+fn _0051_() {
+  num_nan("infinitya", false);
+}
+
+#[test]
 fn _0052() {
   num_nan("sun", false);
 }
