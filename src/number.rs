@@ -28,6 +28,13 @@ enum State {
 }
 
 ///
+macro_rules! mul_add {
+  ($v:expr, $c:expr, $t:ty) => {{
+    $v = $v * 10 + (($c as u8) - b'0') as $t
+  }};
+}
+
+///
 pub fn number_from_string(input: &str) -> Number {
   let mut state = State::BeginNumber;
   let mut sign = false;
@@ -48,7 +55,7 @@ pub fn number_from_string(input: &str) -> Number {
         }
         '+' | '0' => state = State::LeadingZeros,
         '1'..='9' => {
-          value = value * 10 + ((ch as u8) - b'0') as u128;
+          mul_add!(value, ch, u128);
           state = State::DigitsBefore;
         }
         'i' | 'I' => state = State::Inf2n,
@@ -62,7 +69,7 @@ pub fn number_from_string(input: &str) -> Number {
       State::LeadingZeros => match ch {
         '0' => {}
         '1'..='9' => {
-          value = value * 10 + ((ch as u8) - b'0') as u128;
+          mul_add!(value, ch, u128);
           state = State::DigitsBefore;
         }
         '.' => state = State::DigitsAfter,
@@ -75,14 +82,14 @@ pub fn number_from_string(input: &str) -> Number {
         _ => panic!("ERROR2"),
       },
       State::DigitsBefore => match ch {
-        '0'..='9' => value = value * 10 + ((ch as u8) - b'0') as u128,
+        '0'..='9' => mul_add!(value, ch, u128),
         'E' | 'e' => state = State::ExponentSign,
         _ => panic!("ERROR3"),
       },
       State::DigitsAfter => match ch {
         '0'..='9' => {
           exponent -= 1;
-          value = value * 10 + ((ch as u8) - b'0') as u128;
+          mul_add!(value, ch, u128);
         }
         'E' | 'e' => state = State::ExponentSign,
         _ => panic!("ERROR4"),
@@ -94,7 +101,7 @@ pub fn number_from_string(input: &str) -> Number {
           state = State::ExponentLeadingZeros;
         }
         '1'..='9' => {
-          exponent_base = exponent_base * 10 + ((ch as u8) - b'0') as i32;
+          mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
         _ => panic!("ERROR5"),
@@ -102,14 +109,14 @@ pub fn number_from_string(input: &str) -> Number {
       State::ExponentLeadingZeros => match ch {
         '0' => {}
         '1'..='9' => {
-          exponent_base = exponent_base * 10 + ((ch as u8) - b'0') as i32;
+          mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
         _ => panic!("ERROR6"),
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
-          exponent_base = exponent_base * 10 + ((ch as u8) - b'0') as i32;
+          mul_add!(exponent_base, ch, i32);
         }
         _ => panic!("ERROR7"),
       },
