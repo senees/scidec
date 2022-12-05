@@ -3,7 +3,7 @@
 This library parses the input text containing a number in scientific format like:
 
 ```
-1234.5678e2
+1234.5678e-2
 ```
 
 and converts to a number represented by the following tuple:
