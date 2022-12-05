@@ -1,3 +1,5 @@
+extern crate core;
+
 mod number;
 #[cfg(test)]
 mod tests;
