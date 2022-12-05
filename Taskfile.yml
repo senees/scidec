@@ -4,6 +4,13 @@ silent: true
 
 tasks:
 
+  all:
+    cmds:
+      - cmd: cargo clean
+      - cmd: cargo build
+      - cmd: cargo test
+      - cmd: cargo clippy
+
   bench:
     desc: Runs benchmarks
     cmds:
