@@ -24,8 +24,7 @@
 
 //! # Number parser
 
-use crate::fsm;
-use crate::fsm::Value;
+use crate::fsm::{recognize, Value};
 
 /// Parsed number.
 #[derive(Eq, PartialEq)]
@@ -131,7 +130,7 @@ pub enum Number {
 /// }
 /// ```
 pub fn number_from_string(input: &str) -> Number {
-  match fsm::recognize(input, 34) {
+  match recognize(input, 34) {
     Value::Finite(sign, value, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
     Value::Infinite(sign) => Number::Infinite(sign),
     Value::NotANumber(signalling) => Number::NotANumber(signalling),
