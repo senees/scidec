@@ -131,7 +131,7 @@ pub enum Number {
 /// }
 /// ```
 pub fn number_from_string(input: &str) -> Number {
-  match fsm::recognize(input) {
+  match fsm::recognize(input, 34) {
     Value::Finite(sign, value, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
     Value::Infinite(sign) => Number::Infinite(sign),
     Value::NotANumber(signalling) => Number::NotANumber(signalling),

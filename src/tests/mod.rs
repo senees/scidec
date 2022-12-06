@@ -32,8 +32,8 @@ fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
     Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
-      assert_eq!(w1, actual_w1);
-      assert_eq!(w0, actual_w0);
+      assert_eq!(w1, actual_w1, "expected w1: {:x}\n  actual w1: {:x}\n", w1, actual_w1);
+      assert_eq!(w0, actual_w0, "expected w0: {:x}\n  actual w0: {:x}\n", w0, actual_w0);
       assert_eq!(exp, actual_exponent);
     }
     Number::Infinite(false) => panic!("expected number, actual value is +Inf"),

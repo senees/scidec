@@ -27,7 +27,7 @@
 /// States of the FSM used for parsing the input text.
 enum State {
   BeginNumber,
-  LeadingZeros,
+  LeadingZerosBefore,
   DigitsBefore,
   DigitsAfter,
   ExponentSign,
@@ -69,14 +69,24 @@ pub enum Value {
   ),
 }
 
-/// Multiplies the value by 10 and adds the numer represented by a character.
-macro_rules! mul_add {
-  ($v:expr, $c:expr, $t:ty) => {{
-    $v = $v * 10 + (($c as u8) - b'0') as $t
+macro_rules! update_value {
+  ($value:expr, $ch:expr, $digits:expr, $max_digits: expr) => {{
+    if $digits <= $max_digits {
+      $value = $value * 10 + (($ch as u8) - b'0') as u128;
+      if $value > 0 {
+        $digits += 1;
+      }
+    }
   }};
 }
 
-pub fn recognize(input: &str) -> Value {
+macro_rules! update_exponent {
+  ($v:expr, $c:expr) => {{
+    $v = $v.saturating_mul(10).saturating_add((($c as u8) - b'0') as i32);
+  }};
+}
+
+pub fn recognize(input: &str, max_digits: u32) -> Value {
   if input.is_empty() {
     return Value::NotANumber(false);
   }
@@ -89,17 +99,18 @@ pub fn recognize(input: &str) -> Value {
   let mut inf = false;
   let mut nan = false;
   let mut signaling = false;
+  let mut digits = 0_u32;
   let last = input.len() - 1;
   for (position, ch) in input.chars().enumerate() {
     match state {
       State::BeginNumber => match ch {
         '-' => {
           sign = true;
-          state = State::LeadingZeros;
+          state = State::LeadingZerosBefore;
         }
-        '+' | '0' => state = State::LeadingZeros,
+        '+' | '0' => state = State::LeadingZerosBefore,
         '1'..='9' => {
-          mul_add!(val, ch, u128);
+          update_value!(val, ch, digits, max_digits);
           state = State::DigitsBefore;
         }
         '.' if position < last => state = State::DigitsAfter,
@@ -111,15 +122,15 @@ pub fn recognize(input: &str) -> Value {
         }
         _ => return Value::NotANumber(false),
       },
-      State::LeadingZeros => match ch {
+      State::LeadingZerosBefore => match ch {
         '0' => {}
         '1'..='9' => {
-          mul_add!(val, ch, u128);
+          update_value!(val, ch, digits, max_digits);
           state = State::DigitsBefore;
         }
         '.' if position == last => {
           exp -= 1;
-          mul_add!(val, b'0', u128);
+          update_value!(val, b'0', digits, max_digits);
         }
         '.' => state = State::DigitsAfter,
         'i' | 'I' => state = State::Inf2n,
@@ -131,10 +142,10 @@ pub fn recognize(input: &str) -> Value {
         _ => return Value::NotANumber(false),
       },
       State::DigitsBefore => match ch {
-        '0'..='9' => mul_add!(val, ch, u128),
+        '0'..='9' => update_value!(val, ch, digits, max_digits),
         '.' if position == last => {
           exp -= 1;
-          mul_add!(val, b'0', u128);
+          update_value!(val, b'0', digits, max_digits);
         }
         '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
@@ -143,7 +154,7 @@ pub fn recognize(input: &str) -> Value {
       State::DigitsAfter => match ch {
         '0'..='9' => {
           exp -= 1;
-          mul_add!(val, ch, u128);
+          update_value!(val, ch, digits, max_digits);
         }
         'E' | 'e' if position < last => state = State::ExponentSign,
         _ => return Value::NotANumber(false),
@@ -155,7 +166,7 @@ pub fn recognize(input: &str) -> Value {
           state = State::ExponentLeadingZeros;
         }
         '1'..='9' => {
-          mul_add!(exp_base, ch, i32);
+          update_exponent!(exp_base, ch);
           state = State::ExponentDigits;
         }
         _ => return Value::NotANumber(false),
@@ -163,14 +174,14 @@ pub fn recognize(input: &str) -> Value {
       State::ExponentLeadingZeros => match ch {
         '0' => {}
         '1'..='9' => {
-          mul_add!(exp_base, ch, i32);
+          update_exponent!(exp_base, ch);
           state = State::ExponentDigits;
         }
         _ => return Value::NotANumber(false),
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
-          mul_add!(exp_base, ch, i32);
+          update_exponent!(exp_base, ch);
         }
         _ => return Value::NotANumber(false),
       },
