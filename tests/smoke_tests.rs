@@ -31,5 +31,5 @@ use scidec::{number_from_string, Number};
 
 #[test]
 fn test_number_from_string() {
-  assert!((Number::Fin(false, 0, 3, -7) == number_from_string("0.00003E-02")));
+  assert!((Number::Finite(false, 0, 3, -7) == number_from_string("0.00003E-02")));
 }

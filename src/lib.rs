@@ -29,7 +29,7 @@
 extern crate core;
 
 mod bid128;
-mod common;
+mod fsm;
 mod number;
 #[cfg(test)]
 mod tests;

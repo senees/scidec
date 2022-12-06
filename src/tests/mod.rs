@@ -30,33 +30,33 @@ mod number_from_string;
 
 fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
-    Number::Fin(actual_sign, actual_w1, actual_w0, actual_exponent) => {
+    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
       assert_eq!(sign, actual_sign);
       assert_eq!(w1, actual_w1);
       assert_eq!(w0, actual_w0);
       assert_eq!(exp, actual_exponent);
     }
-    Number::Inf(false) => panic!("expected number, actual value is +Inf"),
-    Number::Inf(true) => panic!("expected number, actual value is -Inf"),
-    Number::NaN(false) => panic!("expected number, actual value is qNaN"),
-    Number::NaN(true) => panic!("expected number, actual value is SNaN"),
+    Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
+    Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
+    Number::NotANumber(false) => panic!("expected number, actual value is qNaN"),
+    Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
   }
 }
 
 fn num_inf(input: &str, sign: bool) {
   match number_from_string(input) {
-    Number::Inf(actual_sign) => assert_eq!(sign, actual_sign),
-    Number::NaN(false) => panic!("expected number, actual value is qNaN"),
-    Number::NaN(true) => panic!("expected number, actual value is SNaN"),
-    Number::Fin(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
+    Number::Infinite(actual_sign) => assert_eq!(sign, actual_sign),
+    Number::NotANumber(false) => panic!("expected number, actual value is qNaN"),
+    Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
+    Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
   }
 }
 
 fn num_nan(input: &str, signaling: bool) {
   match number_from_string(input) {
-    Number::NaN(actual_signaling) => assert_eq!(signaling, actual_signaling),
-    Number::Inf(false) => panic!("expected number, actual value is +Inf"),
-    Number::Inf(true) => panic!("expected number, actual value is -Inf"),
-    Number::Fin(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
+    Number::NotANumber(actual_signaling) => assert_eq!(signaling, actual_signaling),
+    Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
+    Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
+    Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
   }
 }
