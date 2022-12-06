@@ -55,12 +55,7 @@ pub enum Number {
   ),
 }
 
-/// Returns not-a-number variant of the number.
-macro_rules! nan {
-  () => {
-    return Number::NaN(false)
-  };
-}
+const NUM_NAN: Number = Number::NaN(false);
 
 /// Parses a number properties from text in scientific notation.
 ///
@@ -138,7 +133,7 @@ macro_rules! nan {
 /// ```
 pub fn number_from_string(input: &str) -> Number {
   if input.is_empty() {
-    nan!();
+    return NUM_NAN;
   }
   let mut state = State::BeginNumber;
   let mut sign = false;
@@ -169,7 +164,7 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::LeadingZeros => match ch {
         '0' => {}
@@ -188,7 +183,7 @@ pub fn number_from_string(input: &str) -> Number {
           signaling = true;
           state = State::Nan1n
         }
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::DigitsBefore => match ch {
         '0'..='9' => mul_add!(value, ch, u128),
@@ -198,7 +193,7 @@ pub fn number_from_string(input: &str) -> Number {
         }
         '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::DigitsAfter => match ch {
         '0'..='9' => {
@@ -206,7 +201,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(value, ch, u128);
         }
         'E' | 'e' if position < last => state = State::ExponentSign,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::ExponentSign => match ch {
         '+' | '0' if position < last => state = State::ExponentLeadingZeros,
@@ -218,7 +213,7 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::ExponentLeadingZeros => match ch {
         '0' => {}
@@ -226,54 +221,54 @@ pub fn number_from_string(input: &str) -> Number {
           mul_add!(exponent_base, ch, i32);
           state = State::ExponentDigits;
         }
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
           mul_add!(exponent_base, ch, i32);
         }
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf2n => match ch {
         'n' | 'N' => state = State::Inf3f,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf3f => match ch {
         'f' | 'F' if position == last => infinity = true,
         'f' | 'F' => state = State::Inf4i,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf4i => match ch {
         'i' | 'I' => state = State::Inf5n,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf5n => match ch {
         'n' | 'N' => state = State::Inf6i,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf6i => match ch {
         'i' | 'I' => state = State::Inf7t,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf7t => match ch {
         't' | 'T' => state = State::Inf8y,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Inf8y => match ch {
         'y' | 'Y' if position == last => infinity = true,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Nan1n => match ch {
         'n' | 'N' => state = State::Nan2a,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Nan2a => match ch {
         'a' | 'A' => state = State::Nan3n,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
       State::Nan3n => match ch {
         'n' | 'N' if position == last => nan = true,
-        _ => nan!(),
+        _ => return NUM_NAN,
       },
     }
   }
