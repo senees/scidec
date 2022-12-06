@@ -28,394 +28,396 @@ use super::*;
 
 #[test]
 fn _0001() {
-  num_nan(IN[0], false);
+  bid128_nan(IN[0], false);
 }
 
 #[test]
 fn _0002() {
-  num_fin(IN[1], false, 0, 12, 0);
+  bid128_fin(IN[1], 0x3040000000000000, 0x000000000000000c);
 }
 
 #[test]
 fn _0003() {
-  num_fin(IN[2], false, 0, 12, -2);
+  bid128_fin(IN[2], 0x303c000000000000, 0x000000000000000c);
 }
 
 #[test]
 #[ignore]
 fn _0004() {
-  num_fin(IN[3], false, 0, 0, -1);
+  bid128_fin(IN[3], 0x303e000000000000, 0x0000000000000000);
 }
 
 #[test]
 #[ignore]
 fn _0005() {
-  num_fin(IN[4], false, 0, 0, -1);
+  bid128_fin(IN[4], 0x303e000000000000, 0x0000000000000000);
 }
 
 #[test]
 #[ignore]
 fn _0006() {
-  num_fin(IN[5], false, 0, 0, 0);
+  bid128_fin(IN[5], 0x3040000000000000, 0x0000000000000000);
 }
 
 #[test]
 #[ignore]
 fn _0007() {
-  num_fin(IN[6], false, 0, 10, -1);
+  bid128_fin(IN[6], 0x303e000000000000, 0x000000000000000a);
 }
 
+/*
 #[test]
 fn _0008() {
-  num_fin(IN[7], false, 0, 10, -1);
+  bid128_fin(IN[7], _);
 }
 
 #[test]
 fn _0009() {
-  num_fin(IN[8], false, 0, 1, 2);
+  bid128_fin(IN[8], _);
 }
 
 #[test]
 fn _0010() {
-  num_fin(IN[9], false, 0, 1, 2);
+  bid128_fin(IN[9], _);
 }
 
 #[test]
 fn _0011() {
-  num_fin(IN[10], false, 0, 1, 354);
+  bid128_fin(IN[10], _);
 }
 
 #[test]
 fn _0012() {
-  num_fin(IN[11], false, 0, 1, 2);
+  bid128_fin(IN[11], _);
 }
 
 #[test]
 fn _0013() {
-  num_fin(IN[12], false, 0, 100, 0);
+  bid128_fin(IN[12], _);
 }
 
 #[test]
 fn _0014() {
-  num_fin(IN[13], false, 0, 1, 5);
+  bid128_fin(IN[13], _);
 }
 
 #[test]
 fn _0015() {
-  num_fin(IN[14], false, 0, 1001, -67);
+  bid128_fin(IN[14], _);
 }
 
 #[test]
 fn _0016() {
-  num_fin(IN[15], false, 0, 12345678, -6);
+  bid128_fin(IN[15], _);
 }
 
 #[test]
 fn _0017() {
-  num_fin(IN[16], false, 0, 12, 321);
+  bid128_fin(IN[16], _);
 }
 
 #[test]
 fn _0018() {
-  num_fin(IN[17], false, 0, 938475, -3);
+  bid128_fin(IN[17], _);
 }
 
 #[test]
 fn _0019() {
-  num_fin(IN[18], false, 0, 12, 0);
+  bid128_fin(IN[18], _);
 }
 
 #[test]
 fn _0020() {
-  num_fin(IN[19], true, 0, 12, 0);
+  bid128_fin(IN[19], _);
 }
 
 #[test]
 fn _0021() {
-  num_fin(IN[20], false, 0, 1, 0);
+  bid128_fin(IN[20], _);
 }
 
 #[test]
 fn _0022() {
-  num_fin(IN[21], false, 0, 1, 0);
+  bid128_fin(IN[21], _);
 }
 
 #[test]
 fn _0023() {
-  num_fin(IN[22], true, 0, 1, 0);
+  bid128_fin(IN[22], _);
 }
 
 #[test]
 fn _0024() {
-  num_fin(IN[23], false, 0, 3, -1);
+  bid128_fin(IN[23], _);
 }
 
 #[test]
 fn _0025() {
-  num_fin(IN[24], false, 0, 3, 1);
+  bid128_fin(IN[24], _);
 }
 
 #[test]
 fn _0026() {
-  num_fin(IN[25], false, 0, 3, 1);
+  bid128_fin(IN[25], _);
 }
 
 #[test]
 fn _0027() {
-  num_fin(IN[26], false, 0, 3, 1);
+  bid128_fin(IN[26], _);
 }
 
 #[test]
 fn _0028() {
-  num_fin(IN[27], false, 0, 3, 1);
+  bid128_fin(IN[27], _);
 }
 
 #[test]
 fn _0029() {
-  num_fin(IN[28], false, 0, 3, -3);
+  bid128_fin(IN[28], _);
 }
 
 #[test]
 fn _0030() {
-  num_fin(IN[29], false, 0, 3, -7);
+  bid128_fin(IN[29], _);
 }
 
 #[test]
 fn _0031() {
-  num_fin(IN[30], false, 0x1ed09bead87c0, 0x378d8e63ffffffff, 0);
+  bid128_fin(IN[30], _);
 }
 
 #[test]
 fn _0032() {
-  num_inf(IN[31], false);
+  num_inf(IN[31], _);
 }
 
 #[test]
 fn _0033() {
-  num_inf(IN[32], false);
+  num_inf(IN[32], _);
 }
 
 #[test]
 fn _0034() {
-  num_inf(IN[33], true);
+  num_inf(IN[33], _);
 }
 
 #[test]
 fn _0035() {
-  num_inf(IN[34], false);
+  num_inf(IN[34], _);
 }
 
 #[test]
 fn _0036() {
-  num_inf(IN[35], false);
+  num_inf(IN[35], _);
 }
 
 #[test]
 fn _0037() {
-  num_inf(IN[36], true);
+  num_inf(IN[36], _);
 }
 
 #[test]
 fn _0038() {
-  num_inf(IN[37], true);
+  num_inf(IN[37], _);
 }
 
 #[test]
 fn _0039() {
-  num_nan(IN[38], false);
+  num_nan(IN[38], _);
 }
 
 #[test]
 fn _0040() {
-  num_nan(IN[39], false);
+  num_nan(IN[39], _);
 }
 
 #[test]
 fn _0041() {
-  num_nan(IN[40], false);
+  num_nan(IN[40], _);
 }
 
 #[test]
 fn _0042() {
-  num_nan(IN[41], false);
+  num_nan(IN[41], _);
 }
 
 #[test]
 fn _0043() {
-  num_nan(IN[42], false);
+  num_nan(IN[42], _);
 }
 
 #[test]
 fn _0044() {
-  num_nan(IN[43], true);
+  num_nan(IN[43], _);
 }
 
 #[test]
 fn _0045() {
-  num_nan(IN[44], true);
+  num_nan(IN[44], _);
 }
 
 #[test]
 fn _0046() {
-  num_nan(IN[45], true);
+  num_nan(IN[45], _);
 }
 
 #[test]
 fn _0047() {
-  num_nan(IN[46], true);
+  num_nan(IN[46], _);
 }
 
 #[test]
 fn _0048() {
-  num_nan(IN[47], false);
+  num_nan(IN[47], _);
 }
 
 #[test]
 fn _0049() {
-  num_nan(IN[48], false);
+  num_nan(IN[48], _);
 }
 
 #[test]
 fn _0050() {
-  num_nan(IN[49], false);
+  num_nan(IN[49], _);
 }
 
 #[test]
 fn _0051() {
-  num_nan(IN[50], false);
+  num_nan(IN[50], _);
 }
 
 #[test]
 fn _0052() {
-  num_nan(IN[51], false);
+  num_nan(IN[51], _);
 }
 
 #[test]
 fn _0053() {
-  num_nan(IN[52], false);
+  num_nan(IN[52], _);
 }
 
 #[test]
 fn _0054() {
-  num_nan(IN[53], false);
+  num_nan(IN[53], _);
 }
 
 #[test]
 fn _0055() {
-  num_nan(IN[54], false);
+  num_nan(IN[54], _);
 }
 
 #[test]
 fn _0056() {
-  num_nan(IN[55], false);
+  num_nan(IN[55], _);
 }
 
 #[test]
 fn _0057() {
-  num_nan(IN[56], false);
+  num_nan(IN[56], _);
 }
 
 #[test]
 fn _0058() {
-  num_nan(IN[57], false);
+  num_nan(IN[57], _);
 }
 
 #[test]
 fn _0059() {
-  num_nan(IN[58], false);
+  num_nan(IN[58], _);
 }
 
 #[test]
 fn _0060() {
-  num_nan(IN[59], false);
+  num_nan(IN[59], _);
 }
 
 #[test]
 fn _0061() {
-  num_nan(IN[60], false);
+  num_nan(IN[60], _);
 }
 
 #[test]
 fn _0062() {
-  num_nan(IN[61], false);
+  num_nan(IN[61], _);
 }
 
 #[test]
 fn _0063() {
-  num_nan(IN[62], false);
+  num_nan(IN[62], _);
 }
 
 #[test]
 fn _0064() {
-  num_nan(IN[63], false);
+  num_nan(IN[63], _);
 }
 
 #[test]
 fn _0065() {
-  num_nan(IN[64], false);
+  num_nan(IN[64], _);
 }
 
 #[test]
 fn _0066() {
-  num_nan(IN[65], false);
+  num_nan(IN[65], _);
 }
 
 #[test]
 fn _0067() {
-  num_nan(IN[66], false);
+  num_nan(IN[66], _);
 }
 
 #[test]
 fn _0068() {
-  num_nan(IN[67], false);
+  num_nan(IN[67], _);
 }
 
 #[test]
 fn _0069() {
-  num_nan(IN[68], false);
+  num_nan(IN[68], _);
 }
 
 #[test]
 fn _0070() {
-  num_nan(IN[69], false);
+  num_nan(IN[69], _);
 }
 
 #[test]
 fn _0071() {
-  num_fin(IN[70], false, 0x68db8bac710cb, 0x295e9e1b089a0275, 0);
+  bid128_fin(IN[70], _);
 }
 
 #[test]
 fn _0072() {
-  num_fin(IN[71], true, 0x68db8bac710cb, 0x295e9e1b089a0275, 0);
+  bid128_fin(IN[71], _);
 }
 
 #[test]
 fn _0073() {
-  num_fin(IN[72], false, 0x68db8bac710cb, 0x295e9e1b089a0275, 0x7FFFFFFF);
+  bid128_fin(IN[72], _);
 }
 
 #[test]
 fn _0074() {
-  num_fin(IN[73], true, 0x68db8bac710cb, 0x295e9e1b089a0275, -0x7FFFFFFF);
+  bid128_fin(IN[73], _);
 }
 
 #[test]
 fn _0075() {
-  num_fin(IN[74], false, 0x13426172c74d82, 0x2b878fe7ffffffff, 0);
+  bid128_fin(IN[74], _);
 }
 
 #[test]
 fn _0076() {
-  num_fin(IN[75], true, 0x13426172c74d82, 0x2b878fe7ffffffff, 0);
+  bid128_fin(IN[75], _);
 }
 
 #[test]
 fn _0077() {
-  num_fin(IN[76], false, 0, 1, 2147483647);
+  bid128_fin(IN[76], _);
 }
 
 #[test]
 fn _0078() {
-  num_fin(IN[77], true, 0, 1, -2147483647);
+  bid128_fin(IN[77], _);
 }
+*/

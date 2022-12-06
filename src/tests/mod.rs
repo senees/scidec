@@ -24,11 +24,13 @@
 
 //! Utility functions for unit tests.
 
-use crate::{number_from_string, Number};
+use crate::{bid128_from_string, number_from_string, Number};
 
+mod bid128_from_string;
 mod inputs;
 mod number_from_string;
 
+use crate::bid128::*;
 pub use inputs::IN;
 
 fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
@@ -61,5 +63,20 @@ fn num_nan(input: &str, signaling: bool) {
     Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
     Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
     Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
+  }
+}
+
+fn bid128_fin(input: &str, w1: u64, w0: u64) {
+  let actual = bid128_from_string(input);
+  assert_eq!(w1, actual.w[1]);
+  assert_eq!(w0, actual.w[0]);
+}
+
+fn bid128_nan(input: &str, signaling: bool) {
+  let actual = bid128_from_string(input);
+  if signaling {
+    assert!((BID128_SNAN == actual));
+  } else {
+    assert!((BID128_NAN == actual));
   }
 }

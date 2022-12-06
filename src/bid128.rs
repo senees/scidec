@@ -29,22 +29,22 @@ use crate::fsm::{recognize, Value};
 /// 128-bit decimal in binary format.
 #[derive(Eq, PartialEq)]
 pub struct Bid128 {
-  w: [u64; 2],
+  pub w: [u64; 2],
 }
 
-const BID128_NAN: Bid128 = Bid128 {
+pub const BID128_NAN: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7c00000000000000],
 };
 
-const BID128_SNAN: Bid128 = Bid128 {
+pub const BID128_SNAN: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7e00000000000000],
 };
 
-const BID128_INF: Bid128 = Bid128 {
+pub const BID128_INF: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7800000000000000],
 };
 
-const BID128_NEG_INF: Bid128 = Bid128 {
+pub const BID128_NEG_INF: Bid128 = Bid128 {
   w: [0x0000000000000000, 0xf800000000000000],
 };
 
