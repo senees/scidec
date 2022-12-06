@@ -87,6 +87,7 @@ macro_rules! update_exponent {
   }};
 }
 
+/// Recognizes a number from scientific notation.
 pub fn recognize(input: &str, max_digits: u32) -> Value {
   if input.is_empty() {
     return Value::NotANumber(false);
@@ -252,5 +253,5 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
   if nan {
     return Value::NotANumber(signaling);
   }
-  Value::Finite(sign, val, exp + exp_sign * exp_base)
+  Value::Finite(sign, val, exp.saturating_add(exp_sign.saturating_mul(exp_base)))
 }

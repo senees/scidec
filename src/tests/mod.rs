@@ -30,15 +30,15 @@ mod number_from_string;
 
 fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
-    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exponent) => {
-      assert_eq!(sign, actual_sign);
-      assert_eq!(w1, actual_w1, "expected w1: {:x}\n  actual w1: {:x}\n", w1, actual_w1);
-      assert_eq!(w0, actual_w0, "expected w0: {:x}\n  actual w0: {:x}\n", w0, actual_w0);
-      assert_eq!(exp, actual_exponent);
+    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exp) => {
+      assert_eq!(sign, actual_sign, sign, actual_sign);
+      assert_eq!(w1, actual_w1, "w1\nexpected: {:x}\n  actual: {:x}\n", w1, actual_w1);
+      assert_eq!(w0, actual_w0, "w0\nexpected: {:x}\n  actual: {:x}\n", w0, actual_w0);
+      assert_eq!(exp, actual_exp);
     }
     Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
     Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
-    Number::NotANumber(false) => panic!("expected number, actual value is qNaN"),
+    Number::NotANumber(false) => panic!("expected number, actual value is NaN"),
     Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
   }
 }
@@ -46,7 +46,7 @@ fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
 fn num_inf(input: &str, sign: bool) {
   match number_from_string(input) {
     Number::Infinite(actual_sign) => assert_eq!(sign, actual_sign),
-    Number::NotANumber(false) => panic!("expected number, actual value is qNaN"),
+    Number::NotANumber(false) => panic!("expected number, actual value is NaN"),
     Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
     Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
   }
