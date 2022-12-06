@@ -29,7 +29,6 @@ enum State {
   BeginNumber,
   LeadingZerosBefore,
   DigitsBefore,
-  LeadingZerosAfter,
   DigitsAfter,
   ExponentSign,
   ExponentLeadingZeros,
@@ -95,7 +94,6 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
   let mut state = State::BeginNumber;
   let mut sign = false;
   let mut exp = 0_i32;
-  let mut exp_lead = 0_i32;
   let mut exp_base = 0_i32;
   let mut exp_sign = 1_i32;
   let mut val = 0_u128;
@@ -116,7 +114,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           update_value!(val, ch, digits, max_digits);
           state = State::DigitsBefore;
         }
-        '.' if position < last => state = State::LeadingZerosAfter,
+        '.' if position < last => state = State::DigitsAfter,
         'i' | 'I' => state = State::Inf2n,
         'n' | 'N' => state = State::Nan2a,
         's' | 'S' => {
@@ -131,11 +129,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           update_value!(val, ch, digits, max_digits);
           state = State::DigitsBefore;
         }
-        '.' if position == last => {
-          exp -= 1;
-          update_value!(val, '0', digits, max_digits);
-        }
-        '.' => state = State::LeadingZerosAfter,
+        '.' => state = State::DigitsAfter,
         'i' | 'I' => state = State::Inf2n,
         'n' | 'N' => state = State::Nan2a,
         's' | 'S' => {
@@ -146,28 +140,8 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
       },
       State::DigitsBefore => match ch {
         '0'..='9' => update_value!(val, ch, digits, max_digits),
-        '.' if position == last => {
-          exp -= 1;
-          update_value!(val, '0', digits, max_digits);
-        }
-        '.' => state = State::LeadingZerosAfter,
+        '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
-        _ => return Value::NotANumber(false),
-      },
-      State::LeadingZerosAfter => match ch {
-        '0' => exp_lead -= 1,
-        '1'..='9' => {
-          exp += exp_lead - 1;
-          while exp_lead < 0 {
-            update_value!(val, '0', digits, max_digits);
-            exp_lead += 1;
-          }
-          update_value!(val, ch, digits, max_digits);
-          state = State::DigitsAfter;
-        }
-        'E' | 'e' if position < last => {
-          state = State::ExponentSign;
-        }
         _ => return Value::NotANumber(false),
       },
       State::DigitsAfter => match ch {

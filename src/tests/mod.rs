@@ -33,6 +33,44 @@ mod number_from_string;
 use crate::bid128::*;
 pub use inputs::IN;
 
+const BID128_INPUT: &str = include_str!("bid128.in");
+
+#[test]
+fn a() {
+  for (i, line) in BID128_INPUT.lines().enumerate() {
+    let mut columns = line.trim().split(" ");
+    let rounding = columns.next().unwrap().parse::<u8>().unwrap();
+    let input = columns.next().unwrap().trim_matches('"');
+    let mut bid = columns.next().unwrap().trim_matches('[').trim_matches(']').split(',');
+    let ew1 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+    let ew0 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+    let status = u64::from_str_radix(columns.next().unwrap(), 16).unwrap();
+    let actual = bid128_from_string(input);
+    let aw1 = actual.w[1];
+    let aw0 = actual.w[0];
+    assert_eq!(
+      rounding, 0,
+      "[{}] rounding:\nexpected: {}\n  actual: {}\n",
+      i, 0, rounding
+    );
+    assert_eq!(
+      ew1, aw1,
+      "[{}] w1:\nexpected: {:016x}\n  actual: {:016x}\n",
+      i, ew1, aw1
+    );
+    assert_eq!(
+      ew0, aw0,
+      "[{}] w0:\nexpected: {:016x}\n  actual: {:016x}\n",
+      i, ew0, aw0
+    );
+    assert_eq!(
+      status, 0,
+      "[{}] status:\nexpected: {:02x}\n  actual: {:02x}\n",
+      i, 0, status
+    );
+  }
+}
+
 fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
   match number_from_string(input) {
     Number::Finite(actual_sign, actual_w1, actual_w0, actual_exp) => {

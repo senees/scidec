@@ -28,66 +28,63 @@ use super::*;
 
 #[test]
 fn _0001() {
-  num_nan(IN[0], false);
+  num_nan("", false);
 }
 
 #[test]
 fn _0002() {
-  num_fin(IN[1], false, 0, 12, 0);
+  num_fin("12", false, 0, 12, 0);
 }
 
 #[test]
 fn _0003() {
-  num_fin(IN[2], false, 0, 12, -2);
+  num_fin(".12", false, 0, 12, -2);
 }
 
 #[test]
-#[ignore]
 fn _0004() {
-  num_fin(IN[3], false, 0, 0, -1);
+  num_fin("000.0", false, 0, 0, -1);
 }
 
 #[test]
-#[ignore]
 fn _0005() {
-  num_fin(IN[4], false, 0, 0, -1);
+  num_fin("0.0", false, 0, 0, -1);
 }
 
 #[test]
-#[ignore]
 fn _0006() {
-  num_fin(IN[5], false, 0, 0, 0);
+  num_fin("0.", false, 0, 0, 0);
 }
 
 #[test]
-#[ignore]
 fn _0007() {
-  num_fin(IN[6], false, 0, 10, -1);
+  num_fin("1.0", false, 0, 10, -1);
 }
 
 #[test]
 fn _0008() {
-  num_fin(IN[7], false, 0, 10, -1);
+  num_fin("1.", false, 0, 1, 0);
 }
 
 #[test]
 fn _0009() {
-  num_fin(IN[8], false, 0, 1, 2);
+  num_fin("1.0e2", false, 0, 10, 1);
 }
 
 #[test]
 fn _0010() {
-  num_fin(IN[9], false, 0, 1, 2);
+  num_fin("1.00e2", false, 0, 100, 0);
 }
 
 #[test]
 fn _0011() {
-  num_fin(IN[10], false, 0, 1, 354);
+  num_fin("1.00e354", false, 0, 100, 352);
 }
 
 #[test]
+#[ignore]
 fn _0012() {
-  num_fin(IN[11], false, 0, 1, 2);
+  num_fin("1.000000000000000000000000000000000000000000e2", false, 0, 0, -31);
 }
 
 #[test]
