@@ -43,12 +43,12 @@ fn _0003() {
 
 #[test]
 fn _0004() {
-  num_fin("000.0", false, 0, 0, -1);
+  num_fin("000.0", false, 0, 0, 0);
 }
 
 #[test]
 fn _0005() {
-  num_fin("0.0", false, 0, 0, -1);
+  num_fin("0.0", false, 0, 0, 0);
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn _0006() {
 
 #[test]
 fn _0007() {
-  num_fin("1.0", false, 0, 10, -1);
+  num_fin("1.0", false, 0, 1, 0);
 }
 
 #[test]
@@ -68,37 +68,36 @@ fn _0008() {
 
 #[test]
 fn _0009() {
-  num_fin("1.0e2", false, 0, 10, 1);
+  num_fin("1.0e2", false, 0, 1, 2);
 }
 
 #[test]
 fn _0010() {
-  num_fin("1.00e2", false, 0, 100, 0);
+  num_fin("1.00e2", false, 0, 1, 2);
 }
 
 #[test]
 fn _0011() {
-  num_fin("1.00e354", false, 0, 100, 352);
-}
-
-#[test]
-#[ignore]
-fn _0011_() {
-  num_fin("1.000000000000000000000000000000000000000000e2", false, 0, 100, 352);
+  num_fin("1.00e354", false, 0, 1, 354);
 }
 
 #[test]
 fn _0012() {
-  num_fin("100", false, 0, 100, 0);
+  num_fin("1.000000000000000000000000000000000000000000e2", false, 0, 1, 2);
 }
 
 #[test]
 fn _0013() {
-  num_fin("1e5", false, 0, 1, 5);
+  num_fin("100", false, 0, 100, 0);
 }
 
 #[test]
 fn _0014() {
+  num_fin("1e5", false, 0, 1, 5);
+}
+
+#[test]
+fn _0015() {
   num_fin(
     "0.0000000000000000000000000000000000000000000000000000000000000001001",
     false,
@@ -109,82 +108,82 @@ fn _0014() {
 }
 
 #[test]
-fn _0015() {
+fn _0016() {
   num_fin("1234.5678e-2", false, 0, 12345678, -6);
 }
 
 #[test]
-fn _0016() {
+fn _0017() {
   num_fin("12e321", false, 0, 12, 321);
 }
 
 #[test]
-fn _0017() {
+fn _0018() {
   num_fin("938475E-03", false, 0, 938475, -3);
 }
 
 #[test]
-fn _0018() {
+fn _0019() {
   num_fin("+12", false, 0, 12, 0);
 }
 
 #[test]
-fn _0019() {
+fn _0020() {
   num_fin("-12", true, 0, 12, 0);
 }
 
 #[test]
-fn _0020() {
+fn _0021() {
   num_fin("000001", false, 0, 1, 0);
 }
 
 #[test]
-fn _0021() {
+fn _0022() {
   num_fin("+000001", false, 0, 1, 0);
 }
 
 #[test]
-fn _0022() {
+fn _0023() {
   num_fin("-000001", true, 0, 1, 0);
 }
 
 #[test]
-fn _0023() {
+fn _0024() {
   num_fin("0.3", false, 0, 3, -1);
 }
 
 #[test]
-fn _0024() {
+fn _0025() {
   num_fin("0.3E2", false, 0, 3, 1);
 }
 
 #[test]
-fn _0025() {
+fn _0026() {
   num_fin("0.3e2", false, 0, 3, 1);
 }
 
 #[test]
-fn _0026() {
+fn _0027() {
   num_fin("0.3E02", false, 0, 3, 1);
 }
 
 #[test]
-fn _0027() {
+fn _0028() {
   num_fin("0.3E+02", false, 0, 3, 1);
 }
 
 #[test]
-fn _0028() {
+fn _0029() {
   num_fin("0.3E-02", false, 0, 3, -3);
 }
 
 #[test]
-fn _0029() {
+fn _0030() {
   num_fin("0.00003E-02", false, 0, 3, -7);
 }
 
 #[test]
-fn _0030() {
+fn _0031() {
   num_fin(
     "9999999999999999999999999999999999",
     false,
@@ -195,202 +194,202 @@ fn _0030() {
 }
 
 #[test]
-fn _0031() {
+fn _0032() {
   num_inf("inf", false);
 }
 
 #[test]
-fn _0032() {
+fn _0033() {
   num_inf("+inf", false);
 }
 
 #[test]
-fn _0033() {
+fn _0034() {
   num_inf("-inf", true);
 }
 
 #[test]
-fn _0034() {
+fn _0035() {
   num_inf("infinity", false);
 }
 
 #[test]
-fn _0035() {
+fn _0036() {
   num_inf("+infinity", false);
 }
 
 #[test]
-fn _0036() {
+fn _0037() {
   num_inf("-infinity", true);
 }
 
 #[test]
-fn _0037() {
+fn _0038() {
   num_inf("-inFINity", true);
 }
 
 #[test]
-fn _0038() {
+fn _0039() {
   num_nan("NaN", false);
 }
 
 #[test]
-fn _0039() {
+fn _0040() {
   num_nan("nan", false);
 }
 
 #[test]
-fn _0040() {
+fn _0041() {
   num_nan("NAN", false);
 }
 
 #[test]
-fn _0041() {
+fn _0042() {
   num_nan("+NaN", false);
 }
 
 #[test]
-fn _0042() {
+fn _0043() {
   num_nan("-NaN", false);
 }
 
 #[test]
-fn _0043() {
+fn _0044() {
   num_nan("SNaN", true);
 }
 
 #[test]
-fn _0044() {
+fn _0045() {
   num_nan("+SNaN", true);
 }
 
 #[test]
-fn _0045() {
+fn _0046() {
   num_nan("-SNaN", true);
 }
 
 #[test]
-fn _0046() {
+fn _0047() {
   num_nan("-SNAN", true);
 }
 
 #[test]
-fn _0047() {
+fn _0048() {
   num_nan("qNAN", false);
 }
 
 #[test]
-fn _0048() {
+fn _0049() {
   num_nan("+A132", false);
 }
 
 #[test]
-fn _0049() {
+fn _0050() {
   num_nan("1.1P2", false);
 }
 
 #[test]
-fn _0050() {
+fn _0051() {
   num_nan("1..", false);
 }
 
 #[test]
-fn _0051() {
+fn _0052() {
   num_nan(".", false);
 }
 
 #[test]
-fn _0052() {
+fn _0053() {
   num_nan("1.123P12E", false);
 }
 
 #[test]
-fn _0053() {
+fn _0054() {
   num_nan("0.1E", false);
 }
 
 #[test]
-fn _0054() {
+fn _0055() {
   num_nan("0.1EP", false);
 }
 
 #[test]
-fn _0055() {
+fn _0056() {
   num_nan("0.1E0P", false);
 }
 
 #[test]
-fn _0056() {
+fn _0057() {
   num_nan("0.1E123P", false);
 }
 
 #[test]
-fn _0057() {
+fn _0058() {
   num_nan("IE0", false);
 }
 
 #[test]
-fn _0058() {
+fn _0059() {
   num_nan("InE0", false);
 }
 
 #[test]
-fn _0059() {
+fn _0060() {
   num_nan("Infinety", false);
 }
 
 #[test]
-fn _0060() {
+fn _0061() {
   num_nan("Infinizy", false);
 }
 
 #[test]
-fn _0061() {
+fn _0062() {
   num_nan("Infinitz", false);
 }
 
 #[test]
-fn _0062() {
+fn _0063() {
   num_nan("Infizity", false);
 }
 
 #[test]
-fn _0063() {
+fn _0064() {
   num_nan("Infa", false);
 }
 
 #[test]
-fn _0064() {
+fn _0065() {
   num_nan("nana", false);
 }
 
 #[test]
-fn _0065() {
+fn _0066() {
   num_nan("nun", false);
 }
 
 #[test]
-fn _0066() {
+fn _0067() {
   num_nan("snana", false);
 }
 
 #[test]
-fn _0067() {
+fn _0068() {
   num_nan("infinitya", false);
 }
 
 #[test]
-fn _0068() {
+fn _0069() {
   num_nan("sun", false);
 }
 
 #[test]
-fn _0069() {
+fn _0070() {
   num_nan("123p4", false);
 }
 
 #[test]
-fn _0070() {
+fn _0071() {
   num_fin(
     "340282366920938463463374607431768211455",
     false,
@@ -401,7 +400,7 @@ fn _0070() {
 }
 
 #[test]
-fn _0071() {
+fn _0072() {
   num_fin(
     "-340282366920938463463374607431768211455",
     true,
@@ -412,7 +411,7 @@ fn _0071() {
 }
 
 #[test]
-fn _0072() {
+fn _0073() {
   num_fin(
     "+340282366920938463463374607431768211455E+2147483647",
     false,
@@ -423,7 +422,7 @@ fn _0072() {
 }
 
 #[test]
-fn _0073() {
+fn _0074() {
   num_fin(
     "-340282366920938463463374607431768211455E-2147483647",
     true,
@@ -434,7 +433,7 @@ fn _0073() {
 }
 
 #[test]
-fn _0074() {
+fn _0075() {
   num_fin(
     "99999999999999999999999999999999999999999999999999999999999999999",
     false,
@@ -445,7 +444,7 @@ fn _0074() {
 }
 
 #[test]
-fn _0075() {
+fn _0076() {
   num_fin(
     "-99999999999999999999999999999999999999999999999999999999999999999",
     true,
@@ -456,11 +455,11 @@ fn _0075() {
 }
 
 #[test]
-fn _0076() {
+fn _0077() {
   num_fin("1E+2147483648", false, 0, 1, 2147483647);
 }
 
 #[test]
-fn _0077() {
+fn _0078() {
   num_fin("-1E-2147483648", true, 0, 1, -2147483647);
 }
