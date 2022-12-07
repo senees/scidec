@@ -135,8 +135,8 @@ pub enum Number {
 pub fn number_from_string(input: &str) -> Number {
   match recognize(input, 34) {
     Value::Finite(sign, value, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
-    Value::Infinite(sign) => Number::Infinite(sign),
-    Value::NotANumber(sign, signaling) => Number::NotANumber(sign, signaling),
+    Value::Infinity(sign) => Number::Infinite(sign),
+    Value::Nan(sign, signaling) => Number::NotANumber(sign, signaling),
   }
 }
 
