@@ -60,22 +60,6 @@ pub enum Number {
 
 /// Parses a number properties from text in scientific notation.
 ///
-/// Minimum parsed number is:
-/// ```text
-/// -340282366920938463463374607431768211455E-2147483647
-/// ```
-///
-/// Maximum parsed number is:
-/// ```text
-/// +340282366920938463463374607431768211455E+2147483647
-/// ```
-///
-/// # Panics
-///
-/// This function panics when the parsed number is less than the minimum value
-/// or greater than the maximum value (overflow error is raised).
-/// Overflows are not checked to get the maximum performance.
-///
 /// # Examples
 ///
 /// Input text represents a finite number.
