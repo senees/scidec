@@ -133,6 +133,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           state = State::DigitsBefore;
         }
         '.' => state = State::DigitsAfter,
+        'E' | 'e' => state = State::ExponentSign,
         'i' | 'I' => state = State::Inf2n,
         'n' | 'N' => state = State::Nan2a,
         's' | 'S' => {

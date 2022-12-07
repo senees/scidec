@@ -37,12 +37,12 @@ fn test_input_cases() {
       let rounding = columns.next().unwrap().parse::<u8>().unwrap();
       let input = columns.next().unwrap().trim_matches('"');
       let mut bid = columns.next().unwrap().trim_matches('[').trim_matches(']').split(',');
-      let ew1 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
-      let ew0 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
-      let status = u64::from_str_radix(columns.next().unwrap(), 16).unwrap();
-      let actual = bid128_from_string(input);
-      let aw1 = actual.w[1];
-      let aw0 = actual.w[0];
+      let expected_w1 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+      let expected_w0 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+      let expected_status = u32::from_str_radix(columns.next().unwrap(), 16).unwrap();
+      let (actual, actual_status) = bid128_from_string(input);
+      let actual_w1 = actual.w[1];
+      let actual_w0 = actual.w[0];
       let line_no = i + 1;
       assert_eq!(
         rounding, 0,
@@ -50,25 +50,28 @@ fn test_input_cases() {
         line_no, 0, rounding
       );
       assert_eq!(
-        ew1, aw1,
+        expected_w1, actual_w1,
         "[{}] w1:\nexpected: {:016x}\n  actual: {:016x}\n",
-        line_no, ew1, aw1
+        line_no, expected_w1, actual_w1
       );
       assert_eq!(
-        ew0, aw0,
+        expected_w0, actual_w0,
         "[{}] w0:\nexpected: {:016x}\n  actual: {:016x}\n",
-        line_no, ew0, aw0
+        line_no, expected_w0, actual_w0
       );
       assert_eq!(
-        status, 0,
+        expected_status, actual_status,
         "[{}] status:\nexpected: {:02x}\n  actual: {:02x}\n",
-        line_no, 0, status
+        line_no, 0, actual_status
       );
     }
   }
 }
 
-// #[test]
-// fn test_check() {
-//   bid128_fin("snana", 0x303e000000000000, 0x0000000000000001);
-// }
+#[test]
+fn test_check() {
+  let (actual, actual_status) = bid128_from_string("0e-6211");
+  assert_eq!(0x0000000000000000, actual.w[1]);
+  assert_eq!(0x0000000000000000, actual.w[0]);
+  assert_eq!(0x30, actual_status);
+}
