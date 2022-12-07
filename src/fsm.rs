@@ -89,7 +89,7 @@ macro_rules! update_exponent {
 }
 
 /// Recognizes a number from scientific notation.
-pub fn recognize(input: &str, max_digits: u32) -> Value {
+pub fn recognize(input: &str, max_digits: i32) -> Value {
   let mut sign = false;
   let mut signaling = false;
   if input.is_empty() {
@@ -102,7 +102,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
   let mut val = 0_u128;
   let mut inf = false;
   let mut nan = false;
-  let mut digits = 0_u32;
+  let mut digits = 0_i32;
   let last = input.len() - 1;
   for (position, ch) in input.chars().enumerate() {
     match state {

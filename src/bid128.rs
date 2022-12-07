@@ -32,9 +32,6 @@ pub struct Bid128 {
   pub w: [u64; 2],
 }
 
-// const FLAG_INVALID: u32 = 0x01;
-// const FLAG_NOT_NORMAL: u32 = 0x02;
-// const FLAG_DIV_BY_ZERO: u32 = 0x04;
 const FLAG_OVERFLOW: u32 = 0x08;
 const FLAG_UNDERFLOW: u32 = 0x10;
 const FLAG_INEXACT: u32 = 0x20;
@@ -85,7 +82,7 @@ const BID128_NEG_MIN: Bid128 = Bid128 {
 
 /// Parses a 128-bit floating-point decimal from text in scientific notation.
 pub fn bid128_from_string(input: &str) -> (Bid128, u32) {
-  match recognize(input, 34) {
+  match recognize(input, BID128_NAX_DIGITS) {
     Value::Finite(sign, mut value, mut exponent) => {
       let mut flags = 0;
       let e;
