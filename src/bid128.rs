@@ -83,7 +83,7 @@ const BID128_NEG_MIN: Bid128 = Bid128 {
 /// Parses a 128-bit floating-point decimal from text in scientific notation.
 pub fn bid128_from_string(input: &str) -> (Bid128, u32) {
   match recognize(input, BID128_NAX_DIGITS) {
-    Value::Finite(sign, mut value, mut exponent) => {
+    Value::Finite(sign, mut value, _digit_after, mut exponent) => {
       let mut flags = 0;
       let e;
       if value == 0 {

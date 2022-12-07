@@ -54,6 +54,8 @@ pub enum Value {
     bool,
     /// Recognized value.
     u128,
+    /// Value represented by digit after the last digit to the right (for rounding).
+    Option<u8>,
     /// Exponent.
     i32,
   ),
@@ -72,7 +74,10 @@ pub enum Value {
 }
 
 macro_rules! update_value {
-  ($value:expr, $ch:expr, $digits:expr, $max_digits: expr) => {{
+  ($value:expr, $ch:expr, $digits:expr, $max_digits: expr, $digit_after:expr) => {{
+    if $digits == $max_digits && $digit_after.is_none() {
+      $digit_after = Some((($ch as u8) - b'0'));
+    }
     if $digits < $max_digits {
       $value = $value * 10 + (($ch as u8) - b'0') as u128;
       if $value > 0 {
@@ -103,6 +108,7 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
   let mut inf = false;
   let mut nan = false;
   let mut digits = 0_i32;
+  let mut digit_after: Option<u8> = None;
   let last = input.len() - 1;
   for (position, ch) in input.chars().enumerate() {
     match state {
@@ -113,7 +119,7 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
         }
         '+' | '0' => state = State::LeadingZerosBefore,
         '1'..='9' => {
-          update_value!(val, ch, digits, max_digits);
+          update_value!(val, ch, digits, max_digits, digit_after);
           state = State::DigitsBefore;
         }
         '.' if position < last => state = State::DigitsAfter,
@@ -129,7 +135,7 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
       State::LeadingZerosBefore => match ch {
         '0' => {}
         '1'..='9' => {
-          update_value!(val, ch, digits, max_digits);
+          update_value!(val, ch, digits, max_digits, digit_after);
           state = State::DigitsBefore;
         }
         '.' => state = State::DigitsAfter,
@@ -147,7 +153,7 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
           if digits == max_digits {
             exp += 1;
           }
-          update_value!(val, ch, digits, max_digits)
+          update_value!(val, ch, digits, max_digits, digit_after)
         }
         '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
@@ -158,7 +164,7 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
           if digits < max_digits {
             exp -= 1;
           }
-          update_value!(val, ch, digits, max_digits);
+          update_value!(val, ch, digits, max_digits, digit_after);
         }
         'E' | 'e' if position < last => state = State::ExponentSign,
         _ => return Value::Nan(sign, signaling),
@@ -244,5 +250,10 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
   if nan {
     return Value::Nan(sign, signaling);
   }
-  Value::Finite(sign, val, exp.saturating_add(exp_sign.saturating_mul(exp_base)))
+  Value::Finite(
+    sign,
+    val,
+    digit_after,
+    exp.saturating_add(exp_sign.saturating_mul(exp_base)),
+  )
 }
