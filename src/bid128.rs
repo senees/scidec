@@ -32,55 +32,33 @@ pub struct Bid128 {
   pub w: [u64; 2],
 }
 
-pub const BID128_NAN: Bid128 = Bid128 {
+const BID128_SIGN: u64 = 0x8000000000000000;
+
+const BID128_NAN: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7c00000000000000],
 };
 
-pub const BID128_SNAN: Bid128 = Bid128 {
+const BID128_NEG_NAN: Bid128 = Bid128 {
+  w: [0x0000000000000000, 0xfc00000000000000],
+};
+
+const BID128_SNAN: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7e00000000000000],
 };
 
-pub const BID128_INF: Bid128 = Bid128 {
+const BID128_NEG_SNAN: Bid128 = Bid128 {
+  w: [0x0000000000000000, 0xfe00000000000000],
+};
+
+const BID128_INF: Bid128 = Bid128 {
   w: [0x0000000000000000, 0x7800000000000000],
 };
 
-pub const BID128_NEG_INF: Bid128 = Bid128 {
+const BID128_NEG_INF: Bid128 = Bid128 {
   w: [0x0000000000000000, 0xf800000000000000],
 };
 
 /// Parses a 128-bit floating-point decimal from text in scientific notation.
-///
-/// Minimum parsed number is:
-/// ```text
-/// ?
-/// ```
-///
-/// Maximum parsed number is:
-/// ```text
-/// ?
-/// ```
-///
-/// # Examples
-///
-/// Input text represents a finite number.
-/// ```
-/// ```
-///
-/// Input text represents a positive infinity.
-/// ```
-/// ```
-///
-/// Input text represents a negative infinity.
-/// ```
-/// ```
-///
-/// Input text represents quiet not-a-number.
-/// ```
-/// ```
-///
-/// Input text represents signaling not-a-number.
-/// ```
-/// ```
 pub fn bid128_from_string(input: &str) -> Bid128 {
   match recognize(input, 34) {
     Value::Finite(sign, value, exponent) => {
@@ -91,11 +69,7 @@ pub fn bid128_from_string(input: &str) -> Bid128 {
       } else {
         (6176_i32 + exponent) as u64
       };
-      let s = if sign {
-        0x8000000000000000_u64
-      } else {
-        0x0000000000000000_u64
-      };
+      let s = if sign { BID128_SIGN } else { 0 };
       Bid128 {
         w: [value as u64, ((value >> 64) as u64) | e << 49 | s],
       }
@@ -107,13 +81,12 @@ pub fn bid128_from_string(input: &str) -> Bid128 {
         BID128_INF
       }
     }
-    Value::NotANumber(signalling) => {
-      if signalling {
-        BID128_SNAN
-      } else {
-        BID128_NAN
-      }
-    }
+    Value::NotANumber(sign, signaling) => match (sign, signaling) {
+      (false, false) => BID128_NAN,
+      (false, true) => BID128_SNAN,
+      (true, false) => BID128_NEG_NAN,
+      (true, true) => BID128_NEG_SNAN,
+    },
   }
 }
 

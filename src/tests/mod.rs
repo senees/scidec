@@ -24,97 +24,51 @@
 
 //! Utility functions for unit tests.
 
-use crate::{bid128_from_string, number_from_string, Number};
+use crate::bid128_from_string;
 
-mod bid128_from_string;
-mod inputs;
-mod number_from_string;
-
-use crate::bid128::*;
-pub use inputs::IN;
-
-const BID128_INPUT: &str = include_str!("bid128.in");
+const BID128_INPUT: &str = include_str!("test_cases/bid128.in");
 
 #[test]
-fn a() {
-  for (i, line) in BID128_INPUT.lines().enumerate() {
-    let mut columns = line.trim().split(" ");
-    let rounding = columns.next().unwrap().parse::<u8>().unwrap();
-    let input = columns.next().unwrap().trim_matches('"');
-    let mut bid = columns.next().unwrap().trim_matches('[').trim_matches(']').split(',');
-    let ew1 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
-    let ew0 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
-    let status = u64::from_str_radix(columns.next().unwrap(), 16).unwrap();
-    let actual = bid128_from_string(input);
-    let aw1 = actual.w[1];
-    let aw0 = actual.w[0];
-    assert_eq!(
-      rounding, 0,
-      "[{}] rounding:\nexpected: {}\n  actual: {}\n",
-      i, 0, rounding
-    );
-    assert_eq!(
-      ew1, aw1,
-      "[{}] w1:\nexpected: {:016x}\n  actual: {:016x}\n",
-      i, ew1, aw1
-    );
-    assert_eq!(
-      ew0, aw0,
-      "[{}] w0:\nexpected: {:016x}\n  actual: {:016x}\n",
-      i, ew0, aw0
-    );
-    assert_eq!(
-      status, 0,
-      "[{}] status:\nexpected: {:02x}\n  actual: {:02x}\n",
-      i, 0, status
-    );
-  }
-}
-
-fn num_fin(input: &str, sign: bool, w1: u64, w0: u64, exp: i32) {
-  match number_from_string(input) {
-    Number::Finite(actual_sign, actual_w1, actual_w0, actual_exp) => {
-      assert_eq!(sign, actual_sign);
-      assert_eq!(w1, actual_w1, "w1\nexpected: {:x}\n  actual: {:x}\n", w1, actual_w1);
-      assert_eq!(w0, actual_w0, "w0\nexpected: {:x}\n  actual: {:x}\n", w0, actual_w0);
-      assert_eq!(exp, actual_exp);
+fn test_input_cases() {
+  for (i, mut line) in BID128_INPUT.lines().enumerate() {
+    line = line.trim();
+    if !line.is_empty() && !line.starts_with('#') {
+      let mut columns = line.split(' ');
+      let rounding = columns.next().unwrap().parse::<u8>().unwrap();
+      let input = columns.next().unwrap().trim_matches('"');
+      let mut bid = columns.next().unwrap().trim_matches('[').trim_matches(']').split(',');
+      let ew1 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+      let ew0 = u64::from_str_radix(bid.next().unwrap(), 16).unwrap();
+      let status = u64::from_str_radix(columns.next().unwrap(), 16).unwrap();
+      let actual = bid128_from_string(input);
+      let aw1 = actual.w[1];
+      let aw0 = actual.w[0];
+      let line_no = i + 1;
+      assert_eq!(
+        rounding, 0,
+        "[{}] rounding:\nexpected: {}\n  actual: {}\n",
+        line_no, 0, rounding
+      );
+      assert_eq!(
+        ew1, aw1,
+        "[{}] w1:\nexpected: {:016x}\n  actual: {:016x}\n",
+        line_no, ew1, aw1
+      );
+      assert_eq!(
+        ew0, aw0,
+        "[{}] w0:\nexpected: {:016x}\n  actual: {:016x}\n",
+        line_no, ew0, aw0
+      );
+      assert_eq!(
+        status, 0,
+        "[{}] status:\nexpected: {:02x}\n  actual: {:02x}\n",
+        line_no, 0, status
+      );
     }
-    Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
-    Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
-    Number::NotANumber(false) => panic!("expected number, actual value is NaN"),
-    Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
   }
 }
 
-fn num_inf(input: &str, sign: bool) {
-  match number_from_string(input) {
-    Number::Infinite(actual_sign) => assert_eq!(sign, actual_sign),
-    Number::NotANumber(false) => panic!("expected number, actual value is NaN"),
-    Number::NotANumber(true) => panic!("expected number, actual value is SNaN"),
-    Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
-  }
-}
-
-fn num_nan(input: &str, signaling: bool) {
-  match number_from_string(input) {
-    Number::NotANumber(actual_signaling) => assert_eq!(signaling, actual_signaling),
-    Number::Infinite(false) => panic!("expected number, actual value is +Inf"),
-    Number::Infinite(true) => panic!("expected number, actual value is -Inf"),
-    Number::Finite(_, _, _, _) => panic!("expected infinity, actual value is finite number"),
-  }
-}
-
-fn bid128_fin(input: &str, w1: u64, w0: u64) {
-  let actual = bid128_from_string(input);
-  assert_eq!(w1, actual.w[1]);
-  assert_eq!(w0, actual.w[0]);
-}
-
-fn bid128_nan(input: &str, signaling: bool) {
-  let actual = bid128_from_string(input);
-  if signaling {
-    assert!((BID128_SNAN == actual));
-  } else {
-    assert!((BID128_NAN == actual));
-  }
-}
+// #[test]
+// fn test_check() {
+//   bid128_fin("snana", 0x303e000000000000, 0x0000000000000001);
+// }

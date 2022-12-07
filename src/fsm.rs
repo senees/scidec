@@ -64,6 +64,8 @@ pub enum Value {
   ),
   /// Variant representing an invalid number.
   NotANumber(
+    /// Flag indicating if the value is signed, if `true` then signed.
+    bool,
     /// Flag indicating if this is a signalling NaN, if `true` then signaling.
     bool,
   ),
@@ -71,7 +73,7 @@ pub enum Value {
 
 macro_rules! update_value {
   ($value:expr, $ch:expr, $digits:expr, $max_digits: expr) => {{
-    if $digits <= $max_digits {
+    if $digits < $max_digits {
       $value = $value * 10 + (($ch as u8) - b'0') as u128;
       if $value > 0 {
         $digits += 1;
@@ -88,18 +90,18 @@ macro_rules! update_exponent {
 
 /// Recognizes a number from scientific notation.
 pub fn recognize(input: &str, max_digits: u32) -> Value {
+  let mut sign = false;
+  let mut signaling = false;
   if input.is_empty() {
-    return Value::NotANumber(false);
+    return Value::NotANumber(sign, signaling);
   }
   let mut state = State::BeginNumber;
-  let mut sign = false;
   let mut exp = 0_i32;
   let mut exp_base = 0_i32;
   let mut exp_sign = 1_i32;
   let mut val = 0_u128;
   let mut inf = false;
   let mut nan = false;
-  let mut signaling = false;
   let mut digits = 0_u32;
   let last = input.len() - 1;
   for (position, ch) in input.chars().enumerate() {
@@ -115,13 +117,14 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           state = State::DigitsBefore;
         }
         '.' if position < last => state = State::DigitsAfter,
+        '.' if position == last => break,
         'i' | 'I' => state = State::Inf2n,
         'n' | 'N' => state = State::Nan2a,
         's' | 'S' => {
           signaling = true;
           state = State::Nan1n
         }
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::LeadingZerosBefore => match ch {
         '0' => {}
@@ -136,21 +139,28 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           signaling = true;
           state = State::Nan1n
         }
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::DigitsBefore => match ch {
-        '0'..='9' => update_value!(val, ch, digits, max_digits),
+        '0'..='9' => {
+          if digits == max_digits {
+            exp += 1;
+          }
+          update_value!(val, ch, digits, max_digits)
+        }
         '.' => state = State::DigitsAfter,
         'E' | 'e' => state = State::ExponentSign,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::DigitsAfter => match ch {
         '0'..='9' => {
-          exp -= 1;
+          if digits < max_digits {
+            exp -= 1;
+          }
           update_value!(val, ch, digits, max_digits);
         }
         'E' | 'e' if position < last => state = State::ExponentSign,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::ExponentSign => match ch {
         '+' | '0' if position < last => state = State::ExponentLeadingZeros,
@@ -162,7 +172,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           update_exponent!(exp_base, ch);
           state = State::ExponentDigits;
         }
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::ExponentLeadingZeros => match ch {
         '0' => {}
@@ -170,54 +180,60 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
           update_exponent!(exp_base, ch);
           state = State::ExponentDigits;
         }
-        _ => return Value::NotANumber(false),
+        _ => break,
       },
       State::ExponentDigits => match ch {
         '0'..='9' => {
           update_exponent!(exp_base, ch);
         }
-        _ => return Value::NotANumber(false),
+        _ => break,
       },
       State::Inf2n => match ch {
         'n' | 'N' => state = State::Inf3f,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf3f => match ch {
         'f' | 'F' if position == last => inf = true,
         'f' | 'F' => state = State::Inf4i,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf4i => match ch {
         'i' | 'I' => state = State::Inf5n,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf5n => match ch {
         'n' | 'N' => state = State::Inf6i,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf6i => match ch {
         'i' | 'I' => state = State::Inf7t,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf7t => match ch {
         't' | 'T' => state = State::Inf8y,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Inf8y => match ch {
-        'y' | 'Y' if position == last => inf = true,
-        _ => return Value::NotANumber(false),
+        'y' | 'Y' if position == last => {
+          inf = true;
+          break;
+        }
+        _ => return Value::NotANumber(sign, signaling),
       },
       State::Nan1n => match ch {
         'n' | 'N' => state = State::Nan2a,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, false),
       },
       State::Nan2a => match ch {
         'a' | 'A' => state = State::Nan3n,
-        _ => return Value::NotANumber(false),
+        _ => return Value::NotANumber(sign, false),
       },
       State::Nan3n => match ch {
-        'n' | 'N' if position == last => nan = true,
-        _ => return Value::NotANumber(false),
+        'n' | 'N' => {
+          nan = true;
+          break;
+        }
+        _ => return Value::NotANumber(sign, false),
       },
     }
   }
@@ -225,7 +241,7 @@ pub fn recognize(input: &str, max_digits: u32) -> Value {
     return Value::Infinite(sign);
   }
   if nan {
-    return Value::NotANumber(signaling);
+    return Value::NotANumber(sign, signaling);
   }
   Value::Finite(sign, val, exp.saturating_add(exp_sign.saturating_mul(exp_base)))
 }
