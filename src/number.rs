@@ -25,6 +25,7 @@
 //! # Number parser
 
 use crate::recognizer::{recognize, Value};
+use crate::Rounding;
 
 /// Parsed number.
 #[derive(Eq, PartialEq)]
@@ -117,8 +118,8 @@ pub enum Number {
 /// }
 /// ```
 pub fn number_from_string(input: &str) -> Number {
-  match recognize(input, 34) {
-    Value::Finite(sign, value, _, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
+  match recognize(input, 34, Rounding::ToNearest) {
+    Value::Finite(sign, value, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
     Value::Infinity(sign) => Number::Infinite(sign),
     Value::NaN(sign, signaling) => Number::NaN(sign, signaling),
   }

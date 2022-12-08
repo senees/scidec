@@ -22,9 +22,31 @@
  * SOFTWARE.
  */
 
-//! Finite state machine for recognizing numbers from scientific `E` notation.
+//! Implementation of the recognizer for scientific `E` notation.
 
-/// States of the FSM used for parsing the input text.
+#[repr(i32)]
+pub enum Rounding {
+  ToNearest = 0x00000,
+  Down = 0x00001,
+  Up = 0x00002,
+  ToZero = 0x00003,
+  TiesAway = 0x00004,
+}
+
+impl From<i32> for Rounding {
+  fn from(value: i32) -> Self {
+    match value {
+      0x00000 => Rounding::ToNearest,
+      0x00001 => Rounding::Down,
+      0x00002 => Rounding::Up,
+      0x00003 => Rounding::ToZero,
+      0x00004 => Rounding::ToNearest,
+      _ => Rounding::ToNearest,
+    }
+  }
+}
+
+/// States of the finite state machine used to parse the input text.
 enum State {
   BeginNumber,
   LeadingZerosBefore,
@@ -54,8 +76,6 @@ pub enum Value {
     bool,
     /// Recognized value.
     u128,
-    /// Value represented by digit after the last digit to the right (for rounding).
-    Option<u8>,
     /// Exponent.
     i32,
   ),
@@ -94,7 +114,7 @@ macro_rules! update_exponent {
 }
 
 /// Recognizes a number from scientific notation.
-pub fn recognize(input: &str, max_digits: i32) -> Value {
+pub fn recognize(input: &str, max_digits: i32, rnd: Rounding) -> Value {
   let mut sign = false;
   let mut signaling = false;
   if input.is_empty() {
@@ -244,16 +264,22 @@ pub fn recognize(input: &str, max_digits: i32) -> Value {
       },
     }
   }
+  // check for infinity
   if inf {
     return Value::Infinity(sign);
   }
+  // check for invalid number
   if nan {
     return Value::NaN(sign, signaling);
   }
-  Value::Finite(
-    sign,
-    val,
-    digit_after,
-    exp.saturating_add(exp_sign.saturating_mul(exp_base)),
-  )
+  // apply rounding
+  match rnd {
+    Rounding::ToNearest => {}
+    Rounding::Up => {}
+    Rounding::Down => {}
+    Rounding::ToZero => {}
+    Rounding::TiesAway => {}
+  }
+  // return the finite number
+  Value::Finite(sign, val, exp.saturating_add(exp_sign.saturating_mul(exp_base)))
 }

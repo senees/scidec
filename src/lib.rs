@@ -37,3 +37,4 @@ mod tests;
 
 pub use bid128::{bid128_from_string, Bid128};
 pub use number::{number_from_string, Number};
+pub use recognizer::Rounding;
