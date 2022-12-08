@@ -28,7 +28,7 @@
 
 extern crate test;
 
-use scidec::number_from_string;
+use scidec::bid128_from_string;
 use test::Bencher;
 
 const INPUTS: [&str; 6] = [
@@ -41,43 +41,43 @@ const INPUTS: [&str; 6] = [
 ];
 
 #[bench]
-fn bench_number_from_string_00(b: &mut Bencher) {
+fn bench_bid128_from_string_00(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[0]);
+    let _ = bid128_from_string(INPUTS[0]);
   });
 }
 
 #[bench]
-fn bench_number_from_string_01(b: &mut Bencher) {
+fn bench_bid128_from_string_01(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[1]);
+    let _ = bid128_from_string(INPUTS[1]);
   });
 }
 
 #[bench]
-fn bench_number_from_string_02(b: &mut Bencher) {
+fn bench_bid128_from_string_02(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[2]);
+    let _ = bid128_from_string(INPUTS[2]);
   });
 }
 
 #[bench]
-fn bench_number_from_string_03(b: &mut Bencher) {
+fn bench_bid128_from_string_03(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[3]);
+    let _ = bid128_from_string(INPUTS[3]);
   });
 }
 
 #[bench]
-fn bench_number_from_string_04(b: &mut Bencher) {
+fn bench_bid128_from_string_04(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[4]);
+    let _ = bid128_from_string(INPUTS[4]);
   });
 }
 
 #[bench]
-fn bench_number_from_string_05(b: &mut Bencher) {
+fn bench_bid128_from_string_05(b: &mut Bencher) {
   b.iter(|| {
-    let _ = number_from_string(INPUTS[5]);
+    let _ = bid128_from_string(INPUTS[5]);
   });
 }
