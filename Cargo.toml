@@ -1,6 +1,6 @@
 [package]
 name = "scidec"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Dariusz Depta <depta@senees.de>"]
 description = "Scientific to decimal number converter"
 documentation = "https://docs.rs/scidec/"
