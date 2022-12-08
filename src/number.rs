@@ -24,7 +24,7 @@
 
 //! # Number parser
 
-use crate::fsm::{recognize, Value};
+use crate::recognizer::{recognize, Value};
 
 /// Parsed number.
 #[derive(Eq, PartialEq)]
@@ -48,7 +48,7 @@ pub enum Number {
     bool,
   ),
   /// Variant representing an invalid number.
-  NotANumber(
+  NaN(
     /// Flag indicating if the value is signed,
     /// `true` positive infinity, `false` negative infinity.
     bool,
@@ -101,7 +101,7 @@ pub enum Number {
 ///
 /// let result = number_from_string("NaN");
 /// match result {
-///   Number::NotANumber(false, false) => {}
+///   Number::NaN(false, false) => {}
 ///   _ => panic!()
 /// }
 /// ```
@@ -112,7 +112,7 @@ pub enum Number {
 ///
 /// let result = number_from_string("SNaN");
 /// match result {
-///   Number::NotANumber(false, true) => {}
+///   Number::NaN(false, true) => {}
 ///   _ => panic!()
 /// }
 /// ```
@@ -120,7 +120,7 @@ pub fn number_from_string(input: &str) -> Number {
   match recognize(input, 34) {
     Value::Finite(sign, value, _, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
     Value::Infinity(sign) => Number::Infinite(sign),
-    Value::Nan(sign, signaling) => Number::NotANumber(sign, signaling),
+    Value::NaN(sign, signaling) => Number::NaN(sign, signaling),
   }
 }
 
@@ -134,8 +134,8 @@ mod tests {
     assert!((Number::Finite(false, 0, 0, 0) != Number::Infinite(false)));
     assert!((Number::Infinite(true) != Number::Infinite(false)));
     assert!((Number::Infinite(true) == Number::Infinite(true)));
-    assert!((Number::NotANumber(true, true) != Number::NotANumber(false, false)));
-    assert!((Number::NotANumber(false, false) == Number::NotANumber(false, false)));
+    assert!((Number::NaN(true, true) != Number::NaN(false, false)));
+    assert!((Number::NaN(false, false) == Number::NaN(false, false)));
     Number::Infinite(false).assert_receiver_is_total_eq();
   }
 }

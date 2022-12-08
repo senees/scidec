@@ -30,8 +30,8 @@ extern crate alloc;
 extern crate core;
 
 mod bid128;
-mod fsm;
 mod number;
+mod recognizer;
 #[cfg(test)]
 mod tests;
 

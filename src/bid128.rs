@@ -24,7 +24,7 @@
 
 //! # Number parser for 128-bit floating-point decimals.
 
-use crate::fsm::{recognize, Value};
+use crate::recognizer::{recognize, Value};
 
 /// 128-bit decimal in binary format.
 #[derive(Eq, PartialEq)]
@@ -155,7 +155,7 @@ pub fn bid128_from_string(input: &str) -> (Bid128, u32) {
         (BID128_INF, 0)
       }
     }
-    Value::Nan(sign, signaling) => match (sign, signaling) {
+    Value::NaN(sign, signaling) => match (sign, signaling) {
       (false, false) => (BID128_NAN, 0),
       (false, true) => (BID128_SNAN, 0),
       (true, false) => (BID128_NEG_NAN, 0),
