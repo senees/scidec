@@ -119,7 +119,7 @@ pub enum Number {
 /// ```
 pub fn number_from_string(input: &str) -> Number {
   match recognize(input, 34, Rounding::ToNearest) {
-    Value::Finite(sign, value, exponent) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
+    Value::Finite(sign, value, exponent, _status) => Number::Finite(sign, (value >> 64) as u64, value as u64, exponent),
     Value::Infinity(sign) => Number::Infinite(sign),
     Value::NaN(sign, signaling) => Number::NaN(sign, signaling),
   }

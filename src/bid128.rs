@@ -24,7 +24,7 @@
 
 //! # Number parser for 128-bit floating-point decimals.
 
-use crate::recognizer::{recognize, Value};
+use crate::recognizer::{recognize, Value, FLAG_INEXACT, FLAG_OVERFLOW, FLAG_UNDERFLOW};
 use crate::Rounding;
 
 /// 128-bit decimal in binary format.
@@ -32,10 +32,6 @@ use crate::Rounding;
 pub struct Bid128 {
   pub w: [u64; 2],
 }
-
-const FLAG_OVERFLOW: u32 = 0x08;
-const FLAG_UNDERFLOW: u32 = 0x10;
-const FLAG_INEXACT: u32 = 0x20;
 
 const BID128_BIAS: i32 = 6176;
 
@@ -88,13 +84,13 @@ pub fn bid128_from_string(input: &str) -> (Bid128, u32) {
 
 /// Parses a 128-bit floating-point decimal from text in scientific notation, with rounding mode.
 pub fn bid128_from_string_rnd(input: &str, rnd: Rounding) -> (Bid128, u32) {
-  match recognize(input, BID128_NAX_DIGITS, rnd) {
-    Value::Finite(sign, mut value, mut exponent) => {
-      let mut flags = 0;
+  match recognize(input, BID128_NAX_DIGITS as usize, rnd) {
+    Value::Finite(sign, mut value, mut exponent, status) => {
+      let mut flags = status;
       let e;
       if value == 0 {
         if exponent < -(BID128_BIAS + BID128_NAX_DIGITS) {
-          flags = FLAG_UNDERFLOW | FLAG_INEXACT;
+          flags |= FLAG_UNDERFLOW | FLAG_INEXACT;
           e = 0;
         } else if exponent < -BID128_BIAS {
           e = 0;
@@ -117,10 +113,11 @@ pub fn bid128_from_string_rnd(input: &str, rnd: Rounding) -> (Bid128, u32) {
           }
           if exponent > MAX_EXPONENT {
             // +inf, overflow, inexact
+            flags |= FLAG_OVERFLOW | FLAG_INEXACT;
             return if sign {
-              (BID128_NEG_INF, FLAG_OVERFLOW | FLAG_INEXACT)
+              (BID128_NEG_INF, flags)
             } else {
-              (BID128_INF, FLAG_OVERFLOW | FLAG_INEXACT)
+              (BID128_INF, flags)
             };
           }
         }
@@ -137,10 +134,11 @@ pub fn bid128_from_string_rnd(input: &str, rnd: Rounding) -> (Bid128, u32) {
           }
           if exponent < -BID128_BIAS {
             //  underflow, inexact
+            flags |= FLAG_UNDERFLOW | FLAG_INEXACT;
             return if sign {
-              (BID128_NEG_MIN, FLAG_UNDERFLOW | FLAG_INEXACT)
+              (BID128_NEG_MIN, flags)
             } else {
-              (BID128_MIN, FLAG_UNDERFLOW | FLAG_INEXACT)
+              (BID128_MIN, flags)
             };
           }
         }

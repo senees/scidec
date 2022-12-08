@@ -25,7 +25,7 @@
 //! Utility functions for unit tests.
 
 use crate::bid128::bid128_from_string_rnd;
-use crate::bid128_from_string;
+use crate::recognizer::Rounding;
 
 const BID128_INPUT: &str = include_str!("test_cases.in");
 
@@ -46,20 +46,19 @@ fn test_input_cases() {
       let actual_w0 = actual.w[0];
       let line_no = i + 1;
       assert_eq!(
-        rounding, 0,
-        "[{line_no}] rounding:\nexpected: 0\n  actual: {rounding}\n",
-      );
-      assert_eq!(
         expected_w1, actual_w1,
-        "[{line_no}] w1:\nexpected: {expected_w1:016x}\n  actual: {actual_w1:016x}\n",
+        "[{}] w1:\nexpected: {expected_w1:016x}\n  actual: {actual_w1:016x}\n",
+        line_no
       );
       assert_eq!(
         expected_w0, actual_w0,
-        "[{line_no}] w0:\nexpected: {expected_w0:016x}\n  actual: {actual_w0:016x}\n",
+        "[{}] w0:\nexpected: {expected_w0:016x}\n  actual: {actual_w0:016x}\n",
+        line_no
       );
       assert_eq!(
         expected_status, actual_status,
-        "[{line_no}] status:\nexpected: {expected_status:02x}\n  actual: {actual_status:02x}\n",
+        "[{}] status:\nexpected: {expected_status:02x}\n  actual: {actual_status:02x}\n",
+        line_no
       );
     }
   }
@@ -67,9 +66,9 @@ fn test_input_cases() {
 
 #[test]
 fn test_check() {
-  let s = "-1000000000000000000000000000000000e-6211";
-  let (actual, actual_status) = bid128_from_string(s);
-  assert_eq!(0x8000000000000000, actual.w[1]);
-  assert_eq!(0x0000000000000000, actual.w[0]);
-  assert_eq!(0x30, actual_status);
+  let s = "12345678901234567890123456789012345";
+  let (actual, actual_status) = bid128_from_string_rnd(s, Rounding::TiesAway);
+  assert_eq!(0x30423cde6fff9732, actual.w[1]);
+  assert_eq!(0xde825cd07e96aff3, actual.w[0]);
+  assert_eq!(0x20, actual_status);
 }
