@@ -76,7 +76,6 @@ enum State {
 }
 
 /// Parsed number.
-#[derive(Eq, PartialEq)]
 pub enum Value {
   /// Variant representing a finite number.
   Finite(
@@ -163,9 +162,9 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
         }
         '.' if position < last => state = State::DigitsAfter,
         '.' if position == last => break,
-        'i' | 'I' => state = State::Inf2n,
-        'n' | 'N' => state = State::Nan2a,
-        's' | 'S' => {
+        'i' | 'I' if position < last => state = State::Inf2n,
+        'n' | 'N' if position < last => state = State::Nan2a,
+        's' | 'S' if position < last => {
           signaling = true;
           state = State::Nan1n
         }
@@ -235,7 +234,7 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
         _ => break,
       },
       State::Inf2n => match ch {
-        'n' | 'N' => state = State::Inf3f,
+        'n' | 'N' if position < last => state = State::Inf3f,
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf3f => match ch {
@@ -244,19 +243,19 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf4i => match ch {
-        'i' | 'I' => state = State::Inf5n,
+        'i' | 'I' if position < last => state = State::Inf5n,
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf5n => match ch {
-        'n' | 'N' => state = State::Inf6i,
+        'n' | 'N' if position < last => state = State::Inf6i,
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf6i => match ch {
-        'i' | 'I' => state = State::Inf7t,
+        'i' | 'I' if position < last => state = State::Inf7t,
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf7t => match ch {
-        't' | 'T' => state = State::Inf8y,
+        't' | 'T' if position < last => state = State::Inf8y,
         _ => return Value::NaN(sign, signaling),
       },
       State::Inf8y => match ch {
@@ -267,11 +266,11 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
         _ => return Value::NaN(sign, signaling),
       },
       State::Nan1n => match ch {
-        'n' | 'N' => state = State::Nan2a,
+        'n' | 'N' if position < last => state = State::Nan2a,
         _ => return Value::NaN(sign, false),
       },
       State::Nan2a => match ch {
-        'a' | 'A' => state = State::Nan3n,
+        'a' | 'A' if position < last => state = State::Nan3n,
         _ => return Value::NaN(sign, false),
       },
       State::Nan3n => match ch {
@@ -363,4 +362,20 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
 
   // return finite number
   Value::Finite(sign, val, exp, flags)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_rounding_from_u32() {
+    assert_eq!(0, Rounding::from(0) as u32);
+    assert_eq!(1, Rounding::from(1) as u32);
+    assert_eq!(2, Rounding::from(2) as u32);
+    assert_eq!(3, Rounding::from(3) as u32);
+    assert_eq!(4, Rounding::from(4) as u32);
+    assert_eq!(0, Rounding::from(5) as u32);
+    assert_eq!(0, Rounding::from(100) as u32);
+  }
 }

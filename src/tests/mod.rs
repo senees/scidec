@@ -66,9 +66,9 @@ fn test_input_cases() {
 
 #[test]
 fn test_check() {
-  let s = "0.00003E-02";
-  let (actual, actual_status) = bid128_from_string_rnd(s, Rounding::TiesAway);
-  assert_eq!(0x3032000000000000, actual.w[1], "{:016x}", actual.w[1]);
-  assert_eq!(0x0000000000000003, actual.w[0], "{:016x}", actual.w[0]);
+  let s = "na";
+  let (actual, actual_status) = bid128_from_string_rnd(s, Rounding::ToNearest);
+  assert_eq!(0x7c00000000000000, actual.w[1], "{:016x}", actual.w[1]);
+  assert_eq!(0x0000000000000000, actual.w[0], "{:016x}", actual.w[0]);
   assert_eq!(0x00, actual_status);
 }

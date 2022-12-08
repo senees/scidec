@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-//! # Number parser for 128-bit floating-point decimals.
+//! # Recognizer for 128-bit floating-point decimals.
 
 use crate::recognizer::{recognize, Value, FLAG_INEXACT, FLAG_OVERFLOW, FLAG_UNDERFLOW};
 use crate::Rounding;
 
 /// 128-bit decimal in binary format.
-#[derive(Eq, PartialEq)]
 pub struct Bid128 {
   pub w: [u64; 2],
 }
@@ -165,15 +164,5 @@ pub fn bid128_from_string_rnd(input: &str, rnd: Rounding) -> (Bid128, u32) {
       (true, false) => (BID128_NEG_NAN, 0),
       (true, true) => (BID128_NEG_SNAN, 0),
     },
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test_eq() {
-    BID128_NAN.assert_receiver_is_total_eq();
   }
 }
