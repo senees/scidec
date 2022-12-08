@@ -151,6 +151,7 @@ pub fn recognize(input: &str, max_digits: usize, rnd: Rounding) -> Value {
   for (position, ch) in input.chars().enumerate() {
     match state {
       State::BeginNumber => match ch {
+        ' ' | '\t' | '\n' | '\r' => {}
         '-' => {
           sign = true;
           state = State::LeadingZerosBefore;

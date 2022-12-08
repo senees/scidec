@@ -21,7 +21,7 @@ export RUSTDOCFLAGS="-Cpanic=abort"
 export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
 
 # run all tests
-cargo test --features=coverage
+cargo test
 
 # prepare output directories for coverage results
 mkdir ./target/lcov
