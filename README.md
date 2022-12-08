@@ -14,7 +14,7 @@ to number, represented by the following tuple:
 
 Example:
 
-```Rust
+```rust
 use scidec::{Number, number_from_string};
 
 let result = number_from_string("1234.5678e-2");
